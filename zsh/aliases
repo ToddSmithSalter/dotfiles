@@ -1,0 +1,49 @@
+#  aliases
+alias zshconfig="subl ~/.zshrc"
+alias ohmyzsh="subl ~/.oh-my-zsh"
+alias sshconfig="subl ~/.ssh/config"
+alias gitconfig="subl ~/.gitconfig"
+alias aliasconfig="subl ~/.aliases"
+alias sshkey="cat ~/.ssh/id_rsa.pub | pbcopy && echo 'Copied to clipboard.'"
+alias artisan="php artisan"
+alias hosts="sudo subl /etc/hosts"
+
+# NPM & Bower
+alias nombom='npm cache clean && bower cache clean && rm -rf node_modules bower_components && mkdir node_modules && touch node_modules/.metadata_never_index && npm install && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
+alias nom='npm cache clean && rm -rf node_modules && mkdir node_modules && touch node_modules/.metadata_never_index && npm install'
+alias bom='bower cache clean && rm -rf bower_components && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
+
+# Yarn
+alias yombom='yarn cache clean && bower cache clean && rm -rf node_modules bower_components && mkdir node_modules && touch node_modules/.metadata_never_index && yarn install && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
+alias yom='yarn cache clean && rm -rf node_modules && mkdir node_modules && touch node_modules/.metadata_never_index && yarn install'
+
+# Homestead
+alias he="homestead edit"
+alias hup="homestead up"
+alias hdo="homestead halt"
+alias hssh="homestead ssh"
+alias hs="homestead status"
+alias hp="homestead provision"
+
+
+# Global git aliases
+alias gs='git status'
+alias ga='git add'
+alias gaa='git add -A'
+alias gp='git push'
+alias gd='git diff'
+alias gb='git branch'
+alias gbd='git branch -D'
+alias gc='git commit -m'
+alias gca='git commit -am'
+alias go='git checkout'
+alias gra='git remote add'
+alias grr='git remote rm'
+alias gcl='git clone'
+alias gpu='git pull'
+alias gta='git tag -a -m'
+alias gm='git merge'
+
+# Changed your .gitignore _after_ you have added / commited some files?
+# run `gri` to untrack anything in your updated .gitignore
+alias gri='git ls-files --ignored --exclude-standard | xargs git rm'

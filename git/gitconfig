@@ -1,0 +1,35 @@
+[user]
+  name = Todd Smith-Salter
+  email = todd@centerdrive.ca
+[core]
+  editor = subl -n -w
+  excludesfile = ~/.gitignore
+  quotepath = false
+[difftool "Kaleidoscope"]
+  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[difftool]
+  prompt = false
+[diff]
+  tool = Kaleidoscope
+[credential]
+[mergetool "Kaleidoscope"]
+  cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+  trustExitCode = true
+[mergetool]
+  prompt = false
+  keepBackup = true
+[merge]
+  tool = Kaleidoscope
+[alias]
+  # EXPLORE
+  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+  lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+  ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+  # JASON MCCREARY'S ALIASES
+  unstage = reset HEAD --
+  append = commit --amend --no-edit
+  lola = log --graph --oneline --decorate --all
+  gud = help everyday
+[push]
+  followTags = true
