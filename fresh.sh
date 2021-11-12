@@ -45,6 +45,10 @@ mkdir $HOME/Developer/burke
 rm -rf $HOME/.zshrc
 ln -s $HOME/.dotfiles/.zshrc $HOME/.zshrc
 
+# Removes .gitconfig from $HOME (if it exists) and symlinks the .gitignore from the .dotfiles
+rm -rf $HOME/.gitconfig
+ln -s $HOME/.dotfiles/.gitconfig $HOME/.gitconfig
+
 # Symlink the Mackup config file to the home directory
 ln -s $HOME/.dotfiles/.mackup.cfg $HOME/.mackup.cfg
 

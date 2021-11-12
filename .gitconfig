@@ -5,8 +5,17 @@
   editor = pstorm
   excludesfile = ~/.gitignore
   quotepath = false
+[credential]
+  helper = osxkeychain
+[push]
+  followTags = true
+[pull]
+  rebase = true
+[fetch]
+  prune = true
 [diff]
   tool = pstorm
+  colorMoved = zebra
 [difftool]
   prompt = false
 [difftool.pstorm]
@@ -27,5 +36,6 @@
   append = commit --amend --no-edit
   lola = log --graph --oneline --decorate --all
   gud = help everyday
-[push]
-  followTags = true
+  upstream = !git push -u origin HEAD
+[includeIf "gitdir:~/Developer/teleo/"]
+  path = ~/Developer/teleo/.gitconfig_include
