@@ -1,49 +1,71 @@
-#  aliases
-alias zshconfig="subl ~/.zshrc"
-alias ohmyzsh="subl ~/.oh-my-zsh"
-alias sshconfig="subl ~/.ssh/config"
-alias gitconfig="subl ~/.gitconfig"
-alias aliasconfig="subl ~/.aliases"
-alias sshkey="cat ~/.ssh/id_rsa.pub | pbcopy && echo 'Copied to clipboard.'"
+#  Shortcuts
+alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub && echo 'Copied to clipboard.'"
+alias reloadshell="source $HOME/.zshrc"
+alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
+alias c="clear"
+
+# Directories
+alias library="cd $HOME/Library"
+alias dev="cd $HOME/Developer"
+alias teleo="cd $HOME/Developer/teleo"
+alias tresel="teleo && tresel"
+alias treseldocs = "teleo && docs"
+alias ohmyzsh="cd $HOME/.oh-my-zsh"
+
+# Configurations
+alias zshconfig="$EDITOR ~/.zshrc"
+alias sshconfig="$EDITOR ~/.ssh/config"
+alias gitconfig="$EDITOR ~/.gitconfig"
+alias aliasconfig="$EDITOR ~/.zsh_aliases"
+alias hostsconfig="sudo $EDITOR /etc/hosts"
+
+# Laravel
 alias artisan="php artisan"
-alias hosts="sudo subl /etc/hosts"
+alias fresh="php artisan migrate:fresh --seed"
+alias seed="php artisan db:seed"
 
-# NPM & Bower
-alias nombom='npm cache clean && bower cache clean && rm -rf node_modules bower_components && mkdir node_modules && touch node_modules/.metadata_never_index && npm install && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
-alias nom='npm cache clean && rm -rf node_modules && mkdir node_modules && touch node_modules/.metadata_never_index && npm install'
-alias bom='bower cache clean && rm -rf bower_components && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
+#PHP
+alias cfresh="rm -rf vendor/ composer.lock && composer i"
 
-# Yarn
-alias yombom='yarn cache clean && bower cache clean && rm -rf node_modules bower_components && mkdir node_modules && touch node_modules/.metadata_never_index && yarn install && mkdir bower_components && touch bower_components/.metadata_never_index && bower install'
-alias yom='yarn cache clean && rm -rf node_modules && mkdir node_modules && touch node_modules/.metadata_never_index && yarn install'
+# Docker
+if [ -f ./vendor/bin/sail ]; then
+  alias sail='bash vendor/bin/sail'
+elif [ -f ./ci/sail ]; then
+  alias sail='bash ci/sail'
+fi
+alias docker-composer="docker-compose"
 
-# Homestead
-alias he="homestead edit"
-alias hup="homestead up"
-alias hdo="homestead halt"
-alias hssh="homestead ssh"
-alias hs="homestead status"
-alias hp="homestead provision"
+# NPM
+alias nfresh='rm -rf node_modules/ package-lock.json && npm install'
+alias watch='npm run watch'
+alias hot='npm run hot'
 
+# Python
+alias python=python3
+alias pip=pip3
 
 # Global git aliases
-alias gs='git status'
-alias ga='git add'
-alias gaa='git add -A'
-alias gp='git push'
-alias gd='git diff'
-alias gb='git branch'
-alias gbd='git branch -D'
-alias gc='git commit -m'
-alias gca='git commit -am'
-alias go='git checkout'
-alias gra='git remote add'
-alias grr='git remote rm'
-alias gcl='git clone'
-alias gpu='git pull'
-alias gta='git tag -a -m'
-alias gm='git merge'
+alias gst="git status"
+alias gb="git branch"
+alias gc="git checkout"
+alias gl="git log --oneline --decorate --color"
+alias amend="git add . && git commit --amend --no-edit"
+alias commit="git add . && git commit -m"
+alias diff="git diff"
+alias force="git push --force"
+alias nuke="git clean -df && git reset --hard"
+alias pop="git stash pop"
+alias pull="git pull"
+alias push="git push"
+alias resolve="git add . && git commit --no-edit"
+alias stash="git stash -u"
+alias unstage="git restore --staged ."
+alias wip="commit wip"
 
 # Changed your .gitignore _after_ you have added / commited some files?
 # run `gri` to untrack anything in your updated .gitignore
 alias gri='git ls-files --ignored --exclude-standard | xargs git rm'
+
+# Highcharts
+alias highcharts='highcharts-export-server --nologo true --logLevel 3 --workers 4 --workLimit 4'
