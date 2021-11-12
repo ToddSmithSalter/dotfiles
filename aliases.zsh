@@ -1,5 +1,5 @@
 #  Shortcuts
-alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub && echo 'Copied to clipboard.'"
+alias copyssh="pbcopy < $HOME/.ssh/id_ed25519.pub && echo 'Copied to clipboard.'"
 alias reloadshell="source $HOME/.zshrc"
 alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
 alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
@@ -10,7 +10,7 @@ alias library="cd $HOME/Library"
 alias dev="cd $HOME/Developer"
 alias teleo="cd $HOME/Developer/teleo"
 alias tresel="teleo && tresel"
-alias treseldocs = "teleo && docs"
+alias treseldocs="teleo && docs"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations
