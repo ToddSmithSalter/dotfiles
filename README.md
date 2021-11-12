@@ -4,7 +4,7 @@
 
 This repository services as a way to help setup and maintain my Mac. Consider this repository a fork of [Dries Vints](https://github.com/driesvints/dotfiles) dotfiles. For full instructions on a fresh macOS setup, follow the directions on Dries' repo.
 
-## Steps to Setup you Mac
+## Steps to Setup your Mac
 
 These instructions are for when you've already set up your dotfiles.
 
