@@ -29,12 +29,13 @@ alias seed="php artisan db:seed"
 alias cfresh="rm -rf vendor/ composer.lock && composer i"
 
 # Docker
+alias docker="podman"
+alias docker-composer="docker-compose"
 if [ -f ./vendor/bin/sail ]; then
   alias sail='bash vendor/bin/sail'
 elif [ -f ./ci/sail ]; then
   alias sail='bash ci/sail'
 fi
-alias docker-composer="docker-compose"
 
 # NPM
 alias nfresh='rm -rf node_modules/ package-lock.json && npm install'
