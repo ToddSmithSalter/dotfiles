@@ -13,6 +13,9 @@ export PATH="node_modules/.bin:vendor/bin:$PATH"
 # Load Homebrew sbin to PATH
 export PATH="/usr/local/sbin:$PATH"
 
+# Load Docker bin to PATH
+export PATH="/Applications/Docker.app/Contents/Resources/bin":$PATH
+
 # Gradle
 export GRADLE_HOME="/usr/local/opt/gradle"
 export PATH="$GRADLE_HOME/bin:$PATH"
