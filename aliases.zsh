@@ -29,7 +29,6 @@ alias seed="php artisan db:seed"
 alias cfresh="rm -rf vendor/ composer.lock && composer i"
 
 # Docker
-alias docker="podman"
 alias docker-composer="docker-compose"
 if [ -f ./vendor/bin/sail ]; then
   alias sail='bash vendor/bin/sail'
