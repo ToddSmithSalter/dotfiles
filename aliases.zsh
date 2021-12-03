@@ -65,7 +65,7 @@ alias wip="commit wip"
 
 # Changed your .gitignore _after_ you have added / commited some files?
 # run `gri` to untrack anything in your updated .gitignore
-alias gri='git ls-files --ignored --exclude-standard | xargs git rm'
+alias gri='git rm -r --cached . && git add . && git commit -am "Remove ignored files"'
 
 # Highcharts
 alias highcharts='highcharts-export-server --nologo true --logLevel 3 --workers 4 --workLimit 4'
