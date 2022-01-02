@@ -94,6 +94,7 @@ cask 'font-source-serif-pro'
 mas 'Affinity Designer', id: 824171161
 mas 'Affinity Photo', id: 824183456
 mas 'Darkroom', id: 953286746
+mas 'Reeder 5', id: 1529448980
 mas 'Todoist', id: 585829637
 mas 'Tweetbot', id: 1384080005
 mas 'Unsplash Wallpapers', id: 1284863847
