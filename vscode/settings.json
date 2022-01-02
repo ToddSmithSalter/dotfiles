@@ -1,0 +1,199 @@
+{
+  /**
+   * Better Defaults
+   **/
+  "editor.bracketPairColorization.enabled": true,
+  "editor.copyWithSyntaxHighlighting": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.emptySelectionClipboard": false,
+  "workbench.editor.enablePreview": false,
+  "window.newWindowDimensions": "inherit",
+  "editor.multiCursorModifier": "ctrlCmd",
+  "files.trimTrailingWhitespace": true,
+  "diffEditor.renderSideBySide": false,
+  "editor.autoClosingQuotes": "always",
+  "editor.snippetSuggestions": "inline",
+  "editor.detectIndentation": true,
+  // "window.nativeFullScreen": false,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "editor.cursorBlinking": "solid",
+  "editor.cursorStyle": "line",
+  "editor.cursorWidth": 5,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+
+  /**
+   * Hide Everything
+   */
+  "workbench.activityBar.visible": false,
+  "workbench.sideBar.location": "left",
+  "workbench.statusBar.visible": true,
+  "workbench.editor.showTabs": true,
+  "editor.renderIndentGuides": true,
+  "editor.minimap.enabled": false,
+  "editor.lineNumbers": "on",
+
+  /**
+   * Silence The Noise
+   */
+  "breadcrumbs.enabled": false,
+  "scm.diffDecorations": "none",
+  "editor.hover.enabled": true,
+  "editor.matchBrackets": "always",
+  "workbench.tips.enabled": true,
+  "editor.colorDecorators": true,
+  "git.decorations.enabled": true,
+  "workbench.startupEditor": "none",
+  "editor.lightbulb.enabled": false,
+  "editor.suggestSelection": "first",
+  "editor.selectionHighlight": true,
+  "editor.overviewRulerBorder": false,
+  "editor.renderWhitespace": "selection",
+  "editor.renderLineHighlight": "none",
+  "editor.occurrencesHighlight": false,
+  "problems.decorations.enabled": true,
+  "editor.renderControlCharacters": false,
+  "editor.hideCursorInOverviewRuler": true,
+  "editor.gotoLocation.multipleReferences": "goto",
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "editor.gotoLocation.multipleDeclarations": "goto",
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "editor.gotoLocation.multipleImplementations": "goto",
+  "editor.gotoLocation.multipleTypeDefinitions": "goto",
+
+  /**
+   * Typography
+   **/
+  "workbench.colorTheme": "Cobalt2",
+  "editor.fontFamily": "OperatorMonoLig-Book, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 17,
+  "editor.fontWeight": "400",
+  "editor.lineHeight": 28,
+  "editor.letterSpacing": 0.5,
+  "editor.suggestFontSize": 17,
+  "editor.suggestLineHeight": 25,
+  "terminal.integrated.fontSize": 15,
+  "editor.fontLigatures": true,
+
+  /**
+   * Git
+   **/
+  "git.autofetch": true,
+
+  /**
+   * Find
+   **/
+  "search.useIgnoreFiles": false,
+  "search.exclude": {
+    // Hide everything in /vendor, except the "laravel" and "livewire" folder.
+    "**/vendor/{[^l],?[^ai]}*": true,
+    // Hide everything in /public, except "index.php"
+    "**/public/{[^i],?[^n]}*": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/_ide_helper.php": true,
+    "**/composer.lock": true,
+    "**/package-lock.json": true,
+    "**/.next": true,
+    "storage": true,
+    ".phpunit.result.cache": true
+  },
+
+  /**
+   * Code
+   **/
+  // Include "-" in word selection.
+  "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
+  "emmet.includeLanguages": {
+    "blade": "html",
+    "vue-html": "html",
+    "vue": "html",
+    "javascript": "javascriptreact"
+  },
+  "files.associations": {
+    ".php_cs": "php",
+    ".php_cs.dist": "php"
+  },
+  // Set this so Tailwind-specific syntax doesn't throw errors
+  "css.validate": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  /**
+   * Tailwind CSS
+   **/
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.validate": true,
+
+  /**
+   * PHP
+   **/
+  "php.suggest.basic": false,
+
+  /**
+   * Blade
+   **/
+  "blade.format.enable": true,
+  "[blade]": {
+    "editor.autoClosingBrackets": "always"
+  },
+
+  /**
+   * PHP CS Fixer
+   **/
+  "[php]": {
+    "editor.defaultFormatter": "junstyle.php-cs-fixer"
+  },
+  "php-cs-fixer.onsave": true,
+  "php-cs-fixer.showOutput": false,
+  "php-cs-fixer.autoFixByBracket": false,
+  "php-cs-fixer.rules": "@PSR2",
+
+  "python.defaultInterpreterPath": "/usr/local/bin/python3",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "typescript.suggest.paths": false,
+  "vsintellicode.modify.editor.suggestSelection": "choseToUpdateConfiguration",
+
+  /**
+   * ESLint + Prettier
+   */
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false
+  },
+  // Show eslint icon at bottom toolbar
+  "eslint.alwaysShowStatus": true,
+
+  /**
+   * Window Settings
+   **/
+  // "window.nativeTabs": true,
+  "window.titleBarStyle": "custom",
+  "terminal.integrated.fontFamily": "\"Operator Mono\", \"Inconsolata for Powerline\", monospace",
+  "php-cs-fixer.executablePath": "${extensionPath}/php-cs-fixer.phar",
+  "php-cs-fixer.lastDownload": 1616777861556,
+  "vsicons.dontShowNewVersionMessage": true,
+  "editor.accessibilitySupport": "off",
+  "terminal.integrated.env.osx": {
+    "FIG_NEW_SESSION": "1"
+  }
+}
