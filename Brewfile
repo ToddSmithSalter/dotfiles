@@ -49,6 +49,7 @@ brew 'wp-cli'
 
 # Apps
 cask '1password'
+cask 'bitwarden'
 cask 'dbngin'
 cask 'discord'
 cask 'docker'
@@ -62,6 +63,8 @@ cask 'hyper'
 cask 'imageoptim'
 cask 'mimestream'
 cask 'nextcloud'
+cask 'obsidian'
+cask 'paw'
 cask 'phpmon'
 cask 'phpstorm'
 cask 'raycast'
@@ -90,5 +93,7 @@ cask 'font-source-serif-pro'
 # Mac App Store
 mas 'Affinity Designer', id: 824171161
 mas 'Affinity Photo', id: 824183456
+mas 'Darkroom', id: 953286746
 mas 'Todoist', id: 585829637
 mas 'Tweetbot', id: 1384080005
+mas 'Unsplash Wallpapers', id: 1284863847
