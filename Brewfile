@@ -88,5 +88,7 @@ cask 'font-source-sans-pro'
 cask 'font-source-serif-pro'
 
 # Mac App Store
+mas 'Affinity Designer', id: 824171161
+mas 'Affinity Photo', id: 824183456
 mas 'Todoist', id: 585829637
 mas 'Tweetbot', id: 1384080005
