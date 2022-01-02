@@ -54,12 +54,14 @@ cask 'discord'
 cask 'docker'
 cask 'dropbox'
 cask 'firefox'
+cask 'figma'
 cask 'github'
 cask 'google-chrome'
 cask 'gpg-suite'
 cask 'hyper'
 cask 'imageoptim'
 cask 'mimestream'
+cask 'nextcloud'
 cask 'phpmon'
 cask 'phpstorm'
 cask 'setapp'
@@ -85,7 +87,5 @@ cask 'font-source-sans-pro'
 cask 'font-source-serif-pro'
 
 # Mac App Store
-mas 'Giphy Capture', id: 668208984
-mas 'Speedtest', id: 1153157709
 mas 'Todoist', id: 585829637
 mas 'Tweetbot', id: 1384080005
