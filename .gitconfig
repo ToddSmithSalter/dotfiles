@@ -3,7 +3,7 @@
   email = todd@precisepixels.ca
 [core]
   editor = pstorm
-  excludesfile = ~/.gitignore
+  excludesfile = ~/.dotfiles/.gitignore_global
   quotepath = false
 [credential]
   helper = osxkeychain

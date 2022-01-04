@@ -12,7 +12,7 @@ git clone git@github.com:ToddSmithSalter/newbeginnings.git $DEVELOPER/newbeginni
 # Teleo
 git clone git@gitlab.com:teleo-inc/tresel-2.0/tresel.git $TELEO/tresel
 git clone git@gitlab.com:teleo-inc/tresel-2.0/docs.git $TELEO/tresel-docs
-git clone git@gitlab.com:teleo-inc/tresel-2.0/talon-gateway.git/talon-gateway $TELEO/talon-gateway
+git clone git@gitlab.com:teleo-inc/tresel-2.0/talon-gateway.git $TELEO/talon-gateway
 git clone git@gitlab.com:teleo-inc/tresel-2.0/talon-os-2.git $TELEO/talon-os-2
 git clone git@gitlab.com:teleo-inc/tresel-2.0/tresel-marketing-site.git $TELEO/tresel.io
 git clone git@gitlab.com:teleo-inc/tresel-2.0/tresel-sparkplug.git $TELEO/tresel-sparkplug
