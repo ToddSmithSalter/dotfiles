@@ -91,7 +91,6 @@ source $ZSH/oh-my-zsh.sh
 
 grep -q  ":/Users/todd/.dotfiles/bin:" <<< ":$PATH:" || source $DOTFILES/path.zsh
 
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -100,12 +99,11 @@ grep -q  ":/Users/todd/.dotfiles/bin:" <<< ":$PATH:" || source $DOTFILES/path.zs
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='code'
-else
-  export EDITOR='code'
-fi
+# Make vscode the default editor
+export EDITOR='code'
+
+# Always enable colored `grep` output
+export GREP_OPTIONS="--color=auto"
 
 # Load Node Version Manager
 export NVM_DIR="$HOME/.nvm"
