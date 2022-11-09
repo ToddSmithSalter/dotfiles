@@ -20,6 +20,9 @@ export PATH="/Applications/Docker.app/Contents/Resources/bin":$PATH
 export GRADLE_HOME="/usr/local/opt/gradle"
 export PATH="$GRADLE_HOME/bin:$PATH"
 
+# Rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Android Dev Paths
 # https://gist.github.com/ThePredators/064c46403290a6823e03be833a2a3c21
 export ANDROID_HOME="$HOME/Library/Android/sdk"

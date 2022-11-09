@@ -6,6 +6,7 @@ alias copyssh="pbcopy < $HOME/.ssh/id_ed25519.pub && echo 'Copied to clipboard.'
 alias reloadshell="source $HOME/.zshrc"
 alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
 alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
+alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias c="clear"
 
 # Directories

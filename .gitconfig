@@ -5,10 +5,12 @@
   editor = pstorm
   excludesfile = ~/.dotfiles/.gitignore_global
   quotepath = false
+	autocrlf = input
 [credential]
   helper = osxkeychain
 [push]
   followTags = true
+	autoSetupRemote = true
 [pull]
   rebase = true
 [fetch]
@@ -39,3 +41,5 @@
   upstream = !git push -u origin HEAD
 [includeIf "gitdir:~/Developer/teleo/"]
   path = ~/Developer/teleo/.gitconfig_include
+[init]
+	defaultBranch = main
