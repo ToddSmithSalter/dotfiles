@@ -110,3 +110,20 @@ function scheduler () {
 function silent() {
    "$@" >& /dev/null
 }
+
+# youtube-dl alias
+mp3 () {
+    youtube-dl --ignore-errors -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' "$1"
+}
+
+mp3p () {
+    youtube-dl --ignore-errors --sleep-interval 30 -i -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s' "$1"
+}
+
+dlv () {
+    youtube-dl --ignore-errors -o '%(title)s.%(ext)s' "$1"
+}
+
+dlp () {
+    youtube-dl --yes-playlist --ignore-errors --sleep-interval 30 -o '%(playlist)s/%(title)s.%(ext)s' "$1"
+}

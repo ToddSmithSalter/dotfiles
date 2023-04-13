@@ -24,6 +24,7 @@ brew 'stripe/stripe-mock/stripe-mock'
 brew 'svn'
 brew 'trash' # Manage the Trash bin
 brew 'tree' # List directories in a tree structure
+brew 'youtube-dl'
 brew 'zlib' # Needed for Memcached
 
 # Spatie Medialibrary
@@ -59,7 +60,6 @@ brew 'fig'
 cask 'figma'
 cask 'github'
 cask 'google-chrome'
-cask 'gpg-suite'
 cask 'hyper'
 cask 'imageoptim'
 cask 'mimestream'
