@@ -11,11 +11,11 @@ alias c="clear"
 
 # Directories
 alias library="cd $HOME/Library"
-alias dev="cd $HOME/Developer"
+alias herd="cd $HOME/Herd"
 alias teleo="cd $HOME/Developer/teleo"
 alias tresel="teleo && tresel"
-alias treseldocs="teleo && cd tresel-docs"
 alias burke="cd $HOME/Developer/burke"
+alias ctrac="cd $HOME/Herd/c-trac"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations
@@ -41,8 +41,6 @@ alias ci="composer install"
 alias cda="composer dump-autoload -o"
 alias cfresh="rm -rf vendor/ composer.lock && composer i"
 alias sail='./vendor/bin/sail'
-alias switch-php81="brew unlink php@8.0 && brew link --overwrite --force php"
-alias switch-php80="brew unlink php && brew link --overwrite --force php@8.0"
 
 # Redis
 alias flush-redis="redis-cli FLUSHALL"
