@@ -124,3 +124,8 @@ TWILIO_AC_ZSH_SETUP_PATH=/Users/todd/.twilio-cli/autocomplete/zsh_setup && test 
 
 # Herd injected PHP 8.4 configuration.
 export HERD_PHP_84_INI_SCAN_DIR="/Users/todd/Library/Application Support/Herd/config/php/84/"
+
+
+# Herd injected PHP 8.5 configuration.
+export HERD_PHP_85_INI_SCAN_DIR="/Users/todd/Library/Application Support/Herd/config/php/85/"
+export PATH="$HOME/.local/bin:$PATH"
