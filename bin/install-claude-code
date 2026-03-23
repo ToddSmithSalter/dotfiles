@@ -84,7 +84,7 @@ echo ""
 step "Next steps:"
 if [ ! -d "$DOTFILES/config/claude" ]; then
     echo "  • Clone dotfiles for custom configuration:"
-    echo "    git clone https://github.com/freekmurze/dotfiles.git ~/.dotfiles"
+    echo "    git clone https://github.com/ToddSmithSalter/dotfiles.git ~/.dotfiles"
     echo "    ~/.dotfiles/bin/install-claude-code"
     echo ""
 fi

@@ -4,18 +4,13 @@ alias sudo='sudo '
 #  Shortcuts
 alias copyssh="pbcopy < $HOME/.ssh/id_ed25519.pub && echo 'Copied to clipboard.'"
 alias reloadshell="source $HOME/.zshrc"
-alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
 alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
+alias vscode='code "`pwd`"'
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-alias c="clear"
 
 # Directories
 alias library="cd $HOME/Library"
 alias herd="cd $HOME/Herd"
-alias teleo="cd $HOME/Developer/teleo"
-alias tresel="teleo && tresel"
-alias burke="cd $HOME/Developer/burke"
-alias ctrac="cd $HOME/Herd/c-trac"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations
@@ -25,22 +20,21 @@ alias gitconfig="code $DOTFILES/.gitconfig"
 alias aliasconfig="code $DOTFILES/aliases.zsh"
 alias hostsconfig="sudo code /etc/hosts"
 alias dotfiles="code $DOTFILES"
-alias mysqladm='mysql -u root'
 
-# Laravel
+# Development
 alias a="php artisan"
 alias ar="php artisan remote"
-alias mfs="php artisan migrate:fresh --seed"
-alias seed="php artisan db:seed"
-
-# PHP
-alias c="composer"
+alias c="claude"
 alias cu="composer update"
 alias cr="composer require"
 alias ci="composer install"
 alias cda="composer dump-autoload -o"
 alias cfresh="rm -rf vendor/ composer.lock && composer i"
+alias flush-redis="redis-cli FLUSHALL"
+alias mfs="php artisan migrate:fresh --seed"
+alias phpunit="vendor/bin/phpunit"
 alias sail='./vendor/bin/sail'
+alias seed="php artisan db:seed"
 
 # Redis
 alias flush-redis="redis-cli FLUSHALL"
@@ -63,15 +57,16 @@ alias gb="git branch"
 alias gc="git checkout"
 alias gl="git log --oneline --decorate --color"
 alias amend="git add . && git commit --amend --no-edit"
-alias commit="git add . && git commit -m"
 alias diff="git diff"
 alias force="git push --force"
+alias nah='git reset --hard;git clean -df'
 alias nuke="git clean -df && git reset --hard"
 alias pop="git stash pop"
 alias pull="git pull"
 alias push="git push"
 alias resolve="git add . && git commit --no-edit"
 alias stash="git stash -u"
+alias uncommit="git reset --soft HEAD~1"
 alias unstage="git restore --staged ."
 alias wip="commit wip"
 
@@ -90,7 +85,7 @@ alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && kill
 alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
 
 # IP addresses
-alias ip="curl https://diagnostic.opendns.com/myip ; echo"
+alias ip="curl ifconfig.me/ip ; echo"
 alias localip="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
 
 # Flush Directory Service cache
@@ -103,5 +98,18 @@ alias afk="osascript -e 'tell application \"System Events\" to keystroke \"q\" u
 # Also, clear Apple’s System Logs to improve shell startup speed
 alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
 
-# Restart touch bar
-alias touchbar="killall ControlStrip"
+# Modern CLI tool aliases (conditional on installation)
+if command -v eza &> /dev/null; then
+    alias ls="eza --icons --group-directories-first"
+    alias l="eza -la --icons --group-directories-first --hyperlink"
+    alias ll="eza -l --icons --group-directories-first --hyperlink"
+    alias lt="eza --tree --level=2 --icons"
+fi
+
+if command -v bat &> /dev/null; then
+    alias cat="bat --style=plain"
+fi
+
+if command -v rg &> /dev/null; then
+    alias grep="rg"
+fi

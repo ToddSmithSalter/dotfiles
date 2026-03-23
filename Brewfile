@@ -6,49 +6,57 @@ tap 'homebrew/bundle'
 tap 'nicoverbruggen/homebrew-cask'
 
 # Binaries
-brew 'awscli'
+brew 'ack'
+brew 'agent-browser'
 brew 'bash' # Latest Bash version
 brew 'coreutils' # Those that come with macOS are outdated
+brew 'composer'
+brew 'doctl' # Digital Ocean
 brew 'ffmpeg'
 brew 'gh'
 brew 'git'
 brew 'glab'
-brew 'gnupg'
-brew 'grep'
 brew 'httpie'
 brew 'hub'
-brew 'mackup'
-brew 'mas' # Mac App Store manager
-brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
-brew 'svn'
-brew 'trash' # Manage the Trash bin
-brew 'tree' # List directories in a tree structure
-brew 'youtube-dl'
-brew 'zlib' # Needed for Memcached
-
-# Spatie Medialibrary
-brew 'jpegoptim'
-brew 'optipng'
-brew 'pngquant'
-brew 'svgo'
-brew 'gifsicle'
-
-# Development
 brew 'imagemagick'
 brew 'libmemcached'
+brew 'mackup'
 brew 'memcached'
+brew 'ncdu'
 brew 'php' # needed by herd compiling php extensions
+brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
+brew 'trash' # Manage the Trash bin
+brew 'tree' # List directories in a tree structure
 brew 'yarn'
+brew 'yt-dlp'
+brew 'wget'
 brew 'wp-cli'
+brew 'zlib' # Needed for Memcached
+
+# Zsh
+brew 'zsh-autosuggestions'
+
+## Modern CLI Tools
+brew 'bat'
+brew 'eza'
+brew 'ripgrep'
+brew 'fd'
+brew 'git-delta'
+brew 'fzf'
+brew 'jq'
+brew 'yq'
+
+# Development tools
+cask 'claude-code'
 
 # Apps
 cask '1password'
+cask '1password-cli'
 cask 'bitwarden'
 cask 'brave-browser'
 cask 'discord'
 cask 'docker'
 cask 'dropbox'
-cask 'firefox'
 cask 'figma'
 cask 'github'
 cask 'google-chrome'
@@ -59,7 +67,6 @@ cask 'nextcloud'
 cask 'phpstorm'
 cask 'raycast'
 cask 'signal'
-cask 'sketch'
 cask 'slack'
 cask 'spotify'
 cask 'the-unarchiver'
@@ -69,6 +76,11 @@ cask 'zoom'
 # Quicklook
 cask 'qlmarkdown'
 cask 'quicklook-json'
+cask 'qlcolorcode'
+cask 'qlstephen'
+cask 'quicklook-csv'
+cask 'betterzip'
+cask 'suspicious-package'
 
 # Fonts
 cask 'font-lato'
@@ -78,6 +90,3 @@ cask 'font-source-code-pro-for-powerline'
 cask 'font-source-code-pro'
 cask 'font-source-sans-pro'
 cask 'font-source-serif-pro'
-
-# Mac App Store
-mas 'Darkroom', id: 953286746

@@ -27,7 +27,7 @@ success "Dotfiles updated"
 step "Updating Homebrew packages"
 brew update
 brew upgrade
-brew bundle --file=~/.dotfiles/config/Brewfile
+brew bundle --file=~/.dotfiles/Brewfile
 brew cleanup
 success "Homebrew packages updated"
 

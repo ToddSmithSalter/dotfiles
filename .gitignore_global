@@ -41,5 +41,12 @@ Thumbs.db
 # Sublime Text
 *.sublime-project
 
-# Vagrant
-.vagrant/
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+.phpunit-watcher-cache.php
+.phpunit.result.cache
+
+# Claude
+.claude/settings.local.json

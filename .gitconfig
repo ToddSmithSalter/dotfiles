@@ -3,9 +3,9 @@
   email = todd@precisepixels.ca
 [core]
   editor = pstorm
-  excludesfile = ~/.dotfiles/.gitignore_global
+  excludesfile = /Users/todd/.gitignore_global
   quotepath = false
-	autocrlf = input
+	autocrlf = false
 [credential]
   helper = osxkeychain
 [push]
