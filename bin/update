@@ -20,7 +20,7 @@ echo ""
 
 # Update dotfiles repo
 step "Pulling latest changes"
-git -C ~/.dotfiles pull origin main
+git -C ~/.dotfiles pull origin master
 success "Dotfiles updated"
 
 # Update Homebrew and packages
