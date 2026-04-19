@@ -53,7 +53,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh"
+    "command": "/Users/todd/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "laravel-simplifier@laravel": true,
