@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Skill(ray-skill:*)",
+      "Skill(fix-gitlab-issue:*)",
       "Skill(php-guidelines-from-spatie:*)",
       "Skill(agent-browser:*)",
       "Bash(gh:*)",
@@ -53,7 +54,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "/Users/todd/.claude/statusline.sh"
+    "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "laravel-simplifier@laravel": true,
