@@ -47,7 +47,7 @@ Pages/
 
 Two blocks separated by a blank line: library imports first, then application imports. Use absolute paths with aliases (`@/`):
 
-```tsx
+```typescript
 import { onMounted, ref, watchEffect } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
