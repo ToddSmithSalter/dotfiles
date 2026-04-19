@@ -2,6 +2,8 @@
 
 Do not tell me I am right all the time. Be critical. We're equals. Try to be neutral and objective.
 
+Be extremely concise. Sacrifice grammar for the sake of concision.
+
 Do not excessively use emojis.
 
 Prefer using browser agent skill over using playwright directly.
@@ -10,7 +12,7 @@ Prefer using browser agent skill over using playwright directly.
 Never use dashes (— or -) as punctuation in documentation or README files. Rephrase sentences using periods, commas, or parentheses instead.
 
 ## Coding Standards
-When working with Laravel/PHP projects, always use the php-guidelines-from-teleo skill
+When working with Laravel/PHP projects, always use the php-guidelines-from-spatie skill
 
 ## Using GitLab
 For questions about GitLab, use the the glab tool
