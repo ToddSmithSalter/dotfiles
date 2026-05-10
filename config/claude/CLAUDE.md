@@ -11,6 +11,10 @@ Prefer using browser agent skill over using playwright directly.
 ## Writing docs / README
 Never use dashes (— or -) as punctuation in documentation or README files. Rephrase sentences using periods, commas, or parentheses instead.
 
+## Design
+Look for DESIGN.md in the working directory root and follow its guidelines for all front-end design
+Use the frontend-design skill
+
 ## Coding Standards
 When working with Laravel/PHP projects, always use the php-guidelines-from-spatie skill
 
