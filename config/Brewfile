@@ -45,9 +45,6 @@ brew 'fzf'
 brew 'jq'
 brew 'yq'
 
-# Development tools
-cask 'claude-code'
-
 # Apps
 cask '1password'
 cask '1password-cli'
