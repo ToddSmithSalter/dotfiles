@@ -50,14 +50,14 @@ metadata:
   ```php
   /**
    * @param array<int, MyObject> $myArray
-   * @param int $typedArgument 
+   * @param int $typedArgument
    */
   function someFunction(array $myArray, int $typedArgument) {}
   ```
 - Use array shape notation for fixed keys, put each key on it's own line:
   ```php
   /** @return array{
-     first: SomeClass, 
+     first: SomeClass,
      second: SomeClass
   } */
   ```
@@ -136,7 +136,7 @@ if ($user->isActive()) {
       $this->info("Processing item id `{$item->id}`...");
       $this->processItem($item);
   });
-  
+
   $this->comment("Processed {$items->count()} items.");
   ```
 

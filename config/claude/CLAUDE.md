@@ -8,8 +8,8 @@ Do not excessively use emojis.
 
 Prefer using browser agent skill over using playwright directly.
 
-## Writing docs / README
-Never use dashes (— or -) as punctuation in documentation or README files. Rephrase sentences using periods, commas, or parentheses instead.
+## Writing
+Never use dashes (– or —) as punctuation in documentation, README files, or in general. Rephrase sentences using periods, commas, or parentheses instead. Prefer Canadian spelling (e.g. "colour" instead of "color").
 
 ## Design
 Look for DESIGN.md in the working directory root and follow its guidelines for all front-end design

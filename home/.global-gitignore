@@ -49,4 +49,4 @@ yarn-error.log
 .phpunit.result.cache
 
 # Claude
-**/.claude/settings.local.json
+.claude/settings.local.json

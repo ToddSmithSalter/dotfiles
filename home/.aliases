@@ -14,10 +14,10 @@ alias herd="cd $HOME/Herd"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations
-alias zshconfig="code $DOTFILES/.zshrc"
+alias zshconfig="code $DOTFILES/home/.zshrc"
 alias sshconfig="code $HOME/.ssh/config"
-alias gitconfig="code $DOTFILES/.gitconfig"
-alias aliasconfig="code $DOTFILES/aliases.zsh"
+alias gitconfig="code $DOTFILES/home/.gitconfig"
+alias aliasconfig="code $DOTFILES/home/.aliases"
 alias hostsconfig="sudo code /etc/hosts"
 alias dotfiles="code $DOTFILES"
 
@@ -39,8 +39,8 @@ alias seed="php artisan db:seed"
 # Redis
 alias flush-redis="redis-cli FLUSHALL"
 
-# Docker
-alias docker-composer="docker-compose"
+# Docker / Podman
+alias docker=podman
 
 # NPM
 alias nfresh='rm -rf node_modules/ package-lock.json && npm install'

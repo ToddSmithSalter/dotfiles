@@ -1,5 +1,5 @@
 ---
-name: prd-to-issues
+name: to-issues
 description: Break a PRD into independently-grabbable Gitlab issues using tracer-bullet vertical slices. Use when user wants to convert a PRD to issues, create implementation tickets, or break down a PRD into work items.
 ---
 

@@ -3,16 +3,14 @@
   email = todd@precisepixels.ca
 [core]
   editor = pstorm
-  excludesfile = /Users/todd/.gitignore_global
+  excludesfile = /Users/todd/.global-gitignore
   quotepath = false
 	autocrlf = false
-[credential]
-  helper = osxkeychain
 [push]
   followTags = true
 	autoSetupRemote = true
 [pull]
-  rebase = true
+  rebase = false
 [fetch]
   prune = true
 [diff]
@@ -43,3 +41,15 @@
   path = ~/Developer/teleo/.gitconfig_include
 [init]
 	defaultBranch = main
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[commit]
+  gpgsign = true
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential

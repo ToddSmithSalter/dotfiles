@@ -2,6 +2,8 @@
 
 set -e  # Exit on error (but we use || true for optional steps)
 
+DOTFILES_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
 # Colors
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
@@ -22,25 +24,23 @@ sudo -v
 touch ~/.hushlogin
 step "Installing Oh My Zsh"
 if [ ! -d ~/.oh-my-zsh ]; then
-    rm -rf ~/.oh-my-zsh
     curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh -s -- --unattended || warn "Oh My Zsh installation failed"
 fi
 success "Oh My Zsh installed"
 
-# Git Configuration
-step "Configuring Git"
-ln -sf ~/.dotfiles/home/.gitconfig ~/.gitconfig
-ln -sf ~/.dotfiles/home/.global-gitignore ~/.global-gitignore
-success "Git configured"
-
-# Symlinks
+# Symlinks - link every dotfile in home/ into $HOME
 step "Creating symlinks"
-rm -f ~/.zshrc ~/.vimrc ~/.vim ~/.mackup.cfg
-ln -sf ~/.dotfiles/.zshrc ~/.zshrc
-ln -sf ~/.dotfiles/.vimrc ~/.vimrc
-ln -sf ~/.dotfiles/.vim ~/.vim
-ln -sf ~/.dotfiles/.mackup.cfg ~/.mackup.cfg
-success "Symlinks created"
+for file in "$DOTFILES_DIR"/home/.*; do
+    name="$(basename "$file")"
+    [ "$name" = "." ] || [ "$name" = ".." ] && continue
+    rm -rf "$HOME/$name"
+    ln -sf "$file" "$HOME/$name"
+    success "Linked ~/$name"
+done
+
+rm -rf "$HOME/.mackup.cfg"
+ln -sf "$DOTFILES_DIR/macos/.mackup.cfg" "$HOME/.mackup.cfg"
+success "Linked ~/.mackup.cfg"
 
 # Homebrew
 step "Installing Homebrew"
@@ -51,14 +51,27 @@ if ! command -v brew &>/dev/null; then
 fi
 success "Homebrew installed"
 
+# nvm + latest Node LTS
+step "Installing nvm and Node LTS"
+export NVM_DIR="$HOME/.nvm"
+if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash || warn "nvm installation failed"
+fi
+\. "$NVM_DIR/nvm.sh"
+nvm install --lts && nvm alias default 'lts/*' || warn "Node LTS installation failed"
+success "nvm and Node LTS installed"
+
 # Update Homebrew recipes
 brew update
 
 # Install all our dependencies with bundle (See Brewfile)
 step "Installing packages from Brewfile"
 brew tap homebrew/bundle
-brew bundle
+brew bundle --file="$DOTFILES_DIR/config/Brewfile"
 success "Brewfile processed"
+
+# Complete agent-browser setup (installed via Brewfile)
+agent-browser install || warn "agent-browser setup skipped"
 
 # Install PHP extensions with PECL
 pecl install imagick 2>/dev/null || warn "imagick already installed or failed"
@@ -73,18 +86,25 @@ composer global require laravel/valet || warn "valet already installed or failed
 valet install || warn "valet already installed or failed"
 success "Composer packages processed"
 
-# Install Agent Browser
-agent-browser install 2>/dev/null || warn "agent-browser setup skipped"
-
 # Claude Code setup
 echo ""
 read -p "Install Claude Code? (y/n) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    bash ~/.dotfiles/bin/install-claude-code || warn "Claude Code setup had issues"
+    bash "$DOTFILES_DIR/bin/install-claude-code" || warn "Claude Code setup had issues"
 else
     warn "Skipping Claude Code installation"
 fi
 
-# Set macOS preferences - we will run this last because this will reload the shell
-source .macos
+# Done
+echo ""
+success "Installation complete!"
+echo ""
+step "Next steps:"
+echo "  • Set up macOS defaults: ./macos/set-defaults.sh"
+echo "  • Restore settings: mackup restore (if you have backups)"
+echo "  • Customize aliases: ~/.dotfiles-custom/shell/.aliases"
+echo ""
+echo "Optional:"
+echo "  • Discover more agent skills: https://skills.sh"
+echo ""

@@ -6,21 +6,32 @@ This repository serves as a way to help setup and maintain my Mac. Consider this
 
 ## What's included
 
-### Shell configuration
+### Home dotfiles (`home/`)
 
-- `aliases.zsh` - Common shell aliases
-- `functions.zsh` - Custom shell functions
-- `path.zsh` - PATH configuration
+Files here are symlinked directly into `$HOME` by `bin/install`.
+
+- `.zshrc` - Zsh configuration, including PATH setup, and sources `.aliases` and `.functions`
+- `.aliases` - Common shell aliases
+- `.functions` - Custom shell functions
+- `.gitconfig` - Git configuration
+- `.global-gitignore` - Global gitignore rules
+
+### macOS (`macos/`)
+
+- `.mackup.cfg` - Mackup configuration, symlinked to `$HOME/.mackup.cfg` by `bin/install`
+- `set-defaults.sh` - Configures macOS system defaults, run last by `bin/install`
+
+### Shell configuration (repo root)
+
 - `minimal.zsh-theme` - A minimal Zsh prompt theme
 
-### Package management
+### Package management (`config/`)
 
 - `Brewfile` - All Homebrew packages, casks, and Mac App Store apps installed via `brew bundle`
 
 ### Scripts
 
-- `fresh.sh` - Full Mac setup script run on a new machine
-- `clone.sh` - Clones repositories after a fresh install
+- `bin/install` - Full Mac setup script run on a new machine, symlinks everything in `home/` into `$HOME`
 - `ssh.sh` - Generates a new SSH key pair
 - `bin/install-claude-code` - Standalone script to install and configure Claude Code independently
 - `bin/update` - Updates dotfiles and installed packages
@@ -105,7 +116,7 @@ After going to our checklist above and making sure you backed everything up, we'
 4. Run the installation with:
 
    ```zsh
-   ~/.dotfiles/fresh.sh
+   ~/.dotfiles/bin/install
    ```
 
 5. After mackup is synced with your cloud storage, restore preferences by running `mackup restore`
