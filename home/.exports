@@ -1,0 +1,33 @@
+# Preserve MANPATH if you already defined it somewhere in your config.
+# Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
+export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+
+# You may need to manually set your language environment
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# Make vscode the default editor
+export EDITOR='code'
+
+# Always enable colored `grep` output
+export GREP_OPTIONS="--color=auto"
+
+# Node Version Manager
+export NVM_DIR="$HOME/.nvm"
+
+# Load dotfiles binaries
+export PATH="$DOTFILES/bin:$PATH"
+
+# Extra paths
+export PATH="$HOME/.composer/vendor/bin:$PATH"
+export PATH="$HOME/.node/bin:$PATH"
+export PATH="node_modules/.bin:vendor/bin:$PATH"
+
+# Load Homebrew sbin to PATH
+export PATH="/usr/local/sbin:$PATH"
+
+# Rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Do not auto update brew
+export HOMEBREW_NO_AUTO_UPDATE=1
