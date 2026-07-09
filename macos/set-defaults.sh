@@ -243,13 +243,18 @@ success "Dock configured"
 
 step "Configuring Safari"
 
+# Safari's preferences live in a sandboxed container that macOS blocks direct
+# writes to unless the terminal running this script has Full Disk Access
+# (System Settings > Privacy & Security > Full Disk Access) - and even then
+# some keys may be ignored. Don't let a failure here kill the rest of the script.
+
 # Enable Safari's debug menu
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true 2>/dev/null || warn "Could not set Safari IncludeInternalDebugMenu (needs Full Disk Access)"
 
 # Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+defaults write com.apple.Safari IncludeDevelopMenu -bool true 2>/dev/null || warn "Could not set Safari IncludeDevelopMenu (needs Full Disk Access)"
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true 2>/dev/null || warn "Could not set Safari WebKitDeveloperExtrasEnabledPreferenceKey (needs Full Disk Access)"
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true 2>/dev/null || warn "Could not set Safari WebKit2DeveloperExtrasEnabled (needs Full Disk Access)"
 
 success "Safari configured"
 
@@ -298,11 +303,14 @@ success "TextEdit configured"
 
 step "Configuring Messages"
 
+# Messages' preferences are sandboxed the same way Safari's are - don't let
+# a permission failure here kill the rest of the script either.
+
 # Disable smart quotes as it's annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false 2>/dev/null || warn "Could not set Messages automaticQuoteSubstitutionEnabled (needs Full Disk Access)"
 
 # Disable continuous spell checking
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false 2>/dev/null || warn "Could not set Messages continuousSpellCheckingEnabled (needs Full Disk Access)"
 
 success "Messages configured"
 
