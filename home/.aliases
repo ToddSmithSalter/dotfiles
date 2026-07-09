@@ -10,7 +10,6 @@ alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 
 # Directories
 alias library="cd $HOME/Library"
-alias herd="cd $HOME/Herd"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations

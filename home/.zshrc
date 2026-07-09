@@ -50,3 +50,15 @@ unset file
 
 # Import ssh keys from Keychain
 command -v ssh-add &> /dev/null && ssh-add --apple-use-keychain 2>/dev/null
+
+
+# Herd injected PHP 8.4 configuration.
+export HERD_PHP_84_INI_SCAN_DIR="/Users/todd/Library/Application Support/Herd/config/php/84/"
+
+
+# Herd injected PHP binary.
+export PATH="/Users/todd/Library/Application Support/Herd/bin/":$PATH
+
+
+# Herd injected PHP 8.5 configuration.
+export HERD_PHP_85_INI_SCAN_DIR="/Users/todd/Library/Application Support/Herd/config/php/85/"
