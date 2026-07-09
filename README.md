@@ -34,6 +34,7 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 - `bin/install` - Full Mac setup script run on a new machine, symlinks everything in `home/` into `$HOME`
 - `bin/install-claude-code` - Standalone script to install and configure Claude Code independently
 - `bin/update` - Updates dotfiles and installed packages
+- `bin/db-dump` - Dumps Herd-managed MySQL and PostgreSQL databases before wiping a machine
 
 ### VS Code
 
@@ -90,7 +91,7 @@ First, go through the checklist below to make sure you didn't forget anything be
 - Did you commit and push any changes/branches to your git repositories?
 - Did you remember to save all important documents from non-iCloud directories?
 - Did you save all of your work from apps which aren't synced through iCloud?
-- Did you remember to export important data from your local database?
+- Did you remember to export important data from your local database? Run `bin/db-dump`
 - Did you update [mackup](https://github.com/lra/mackup) to the latest version and ran `mackup backup`?
 
 ### Installing macOS cleanly
