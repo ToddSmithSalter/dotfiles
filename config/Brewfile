@@ -70,7 +70,6 @@ cask 'zoom'
 
 # Quicklook
 cask 'qlmarkdown'
-cask 'quicklook-json'
 cask 'qlcolorcode'
 cask 'qlstephen'
 cask 'quicklook-csv'
