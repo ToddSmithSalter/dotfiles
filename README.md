@@ -19,7 +19,7 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 ### macOS (`macos/`)
 
 - `.mackup.cfg` - Mackup configuration, symlinked to `$HOME/.mackup.cfg` by `bin/install`
-- `set-defaults.sh` - Configures macOS system defaults, run last by `bin/install`
+- `set-defaults.sh` - Configures macOS system defaults, run manually as the last setup step
 
 ### Shell configuration (repo root)
 
@@ -32,7 +32,6 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 ### Scripts
 
 - `bin/install` - Full Mac setup script run on a new machine, symlinks everything in `home/` into `$HOME`
-- `ssh.sh` - Generates a new SSH key pair
 - `bin/install-claude-code` - Standalone script to install and configure Claude Code independently
 - `bin/update` - Updates dotfiles and installed packages
 
@@ -101,11 +100,10 @@ After going to our checklist above and making sure you backed everything up, we'
 ### Setting up your Mac
 
 1. Update macOS to the latest version with the App Store
-2. [Generate a new public and private SSH key](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) by running:
+2. Install [1Password](https://1password.com/downloads/mac) and sign in, then enable its SSH agent so your existing GitHub SSH key is available on this machine:
 
-   ```zsh
-   curl https://raw.githubusercontent.com/ToddSmithSalter/dotfiles/HEAD/ssh.sh | sh -s "<your-email-address>"
-   ```
+   - Open 1Password → Settings → Developer → turn on "Use the SSH Agent"
+   - Your SSH key syncs with your 1Password account, so there's no need to generate a new one per machine
 
 3. Clone this repo to `~/.dotfiles` with:
 
@@ -120,6 +118,7 @@ After going to our checklist above and making sure you backed everything up, we'
    ```
 
 5. After mackup is synced with your cloud storage, restore preferences by running `mackup restore`
-6. Restart your computer to finalize the process
+6. Run `macos/set-defaults.sh` last, once everything else is installed and restored
+7. Restart your computer to finalize the process
 
 Your Mac is now ready to use!
