@@ -8,8 +8,22 @@
 set -e
 
 HERD_BIN="$HOME/Library/Application Support/Herd/bin"
+# Herd only symlinks psql into its convenience bin/, not pg_dump/pg_restore -
+# those live under the versioned service directory instead.
+PG_BIN="$(dirname "$(ls -1 /Users/Shared/Herd/services/postgresql/*/bin/pg_dump 2>/dev/null | sort -V | tail -1)")"
+PG_BIN="${PG_BIN:-$HERD_BIN}"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 OUT_DIR="${1:-$HOME/db-backups/$TIMESTAMP}"
+
+# Herd's MySQL/Postgres don't listen on the client's default socket path, so
+# connect over TCP instead - stable across service recreation, unlike the
+# per-instance socket path Herd generates under /tmp.
+MYSQL_HOST="${DB_DUMP_MYSQL_HOST:-127.0.0.1}"
+MYSQL_PORT="${DB_DUMP_MYSQL_PORT:-3306}"
+MYSQL_USER="${DB_DUMP_MYSQL_USER:-root}"
+PG_HOST="${DB_DUMP_PG_HOST:-127.0.0.1}"
+PG_PORT="${DB_DUMP_PG_PORT:-5432}"
+PG_USER="${DB_DUMP_PG_USER:-root}"
 
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
@@ -25,24 +39,33 @@ mkdir -p "$OUT_DIR"
 # MySQL
 if [ -x "$HERD_BIN/mysqldump" ]; then
     step "Dumping MySQL databases"
-    if "$HERD_BIN/mysqldump" -u root --all-databases --routines --triggers --events > "$OUT_DIR/mysql-all.sql"; then
+    if [ -z "$DB_DUMP_MYSQL_PASSWORD" ]; then
+        stty -echo
+        printf "MySQL password for %s (set DB_DUMP_MYSQL_PASSWORD to skip this prompt): " "$MYSQL_USER"
+        read -r DB_DUMP_MYSQL_PASSWORD
+        stty echo
+        echo ""
+    fi
+    export MYSQL_PWD="$DB_DUMP_MYSQL_PASSWORD"
+    if "$HERD_BIN/mysqldump" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" --all-databases --routines --triggers --events > "$OUT_DIR/mysql-all.sql"; then
         success "MySQL dumped to $OUT_DIR/mysql-all.sql"
     else
         warn "MySQL dump failed"
     fi
+    unset MYSQL_PWD
 else
     warn "mysqldump not found at $HERD_BIN, skipping MySQL"
 fi
 
 # PostgreSQL
-if [ -x "$HERD_BIN/pg_dump" ] && [ -x "$HERD_BIN/psql" ]; then
+if [ -x "$PG_BIN/pg_dump" ] && [ -x "$PG_BIN/psql" ]; then
     step "Dumping PostgreSQL databases"
-    databases="$("$HERD_BIN/psql" -U root -At -c "SELECT datname FROM pg_database WHERE datistemplate = false AND datname != 'postgres';" 2>/dev/null)"
+    databases="$("$PG_BIN/psql" -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d postgres -At -c "SELECT datname FROM pg_database WHERE datistemplate = false AND datname != 'postgres';" 2>/dev/null)"
     if [ -z "$databases" ]; then
         warn "No PostgreSQL databases found (or connection failed)"
     else
         for db in $databases; do
-            if "$HERD_BIN/pg_dump" -U root -Fc "$db" > "$OUT_DIR/pg-$db.dump"; then
+            if "$PG_BIN/pg_dump" -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -Fc "$db" > "$OUT_DIR/pg-$db.dump"; then
                 success "PostgreSQL '$db' dumped to $OUT_DIR/pg-$db.dump"
             else
                 warn "PostgreSQL dump of '$db' failed"
@@ -50,7 +73,7 @@ if [ -x "$HERD_BIN/pg_dump" ] && [ -x "$HERD_BIN/psql" ]; then
         done
     fi
 else
-    warn "pg_dump/psql not found at $HERD_BIN, skipping PostgreSQL"
+    warn "pg_dump/psql not found at $PG_BIN, skipping PostgreSQL"
 fi
 
 echo ""
