@@ -1,32 +1,53 @@
 [user]
   name = Todd Smith-Salter
   email = todd@precisepixels.ca
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHVvejPXrumWtxFUCbi3Blp492sTWyj8Cx2RPy2xM9ay
+
 [core]
   editor = pstorm
   excludesfile = /Users/todd/.global-gitignore
   quotepath = false
 	autocrlf = false
+
 [push]
   followTags = true
 	autoSetupRemote = true
+
 [pull]
   rebase = false
+
 [fetch]
   prune = true
+
 [diff]
   tool = pstorm
   colorMoved = zebra
+
 [difftool]
   prompt = false
+
 [difftool.pstorm]
   cmd = /usr/local/bin/pstorm merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
+
 [merge]
   tool = pstorm
+
 [mergetool]
   prompt = false
   keepBackup = true
+
 [mergetool.pstorm]
   cmd = /usr/local/bin/pstorm diff "$LOCAL" "$REMOTE"
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
+
 [alias]
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
@@ -37,13 +58,17 @@
   lola = log --graph --oneline --decorate --all
   gud = help everyday
   upstream = !git push -u origin HEAD
+
 [includeIf "gitdir:~/Developer/teleo/"]
   path = ~/Developer/teleo/.gitconfig_include
+
 [init]
 	defaultBranch = main
+
 [credential "https://github.com"]
 	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
+
 [credential "https://gist.github.com"]
 	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
