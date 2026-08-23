@@ -32,6 +32,15 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it as a GitLab issue. Apply the type label that matches the work, plus a priority label if it is a `Bug`. No further triage is needed.
 
+## Length
+
+A human reads this spec to decide whether the feature is the right feature. Write for that reader.
+
+- Keep the whole spec under roughly 500 words, not counting an inlined snippet.
+- Write **Problem Statement** and **Solution** as one short paragraph each.
+- Cut a section entirely when the conversation gives it nothing. An empty heading is worse than no heading. **Problem Statement**, **Solution**, and **User Stories** are the only sections that must always appear.
+- Do not restate the same point in two sections.
+
 <spec-template>
 
 ## Problem Statement
@@ -44,7 +53,7 @@ The solution to the problem, from the user's perspective.
 
 ## User Stories
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
+A numbered list of **at most 10** user stories, ordered by impact. Fewer is better. Each one reads:
 
 1. As an <actor>, I want a <feature>, so that <benefit>
 
@@ -52,11 +61,19 @@ A LONG, numbered list of user stories. Each user story should be in the format o
 1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
 </user-story-example>
 
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+This list is for a human reader, not for an agent. It exists so the reader can decide whether the feature is the right feature. Pick the stories that a developer needs to build the feature as the conversation defined it. If the conversation only justifies four stories, write four.
+
+Include a story only when it changes what gets built:
+
+- Keep the stories that name a distinct actor, a distinct outcome, or a decision the reader could disagree with.
+- Drop CRUD variants of one idea. One story covers create, edit, and delete of the same thing.
+- Drop error paths, empty states, validation rules, and permission checks. They belong in **Implementation Decisions**, or nowhere.
+- Drop anything that restates the **Solution** section in story form.
+- Never split one story into sub-stories or lettered parts.
 
 ## Implementation Decisions
 
-A list of implementation decisions that were made. This can include:
+A short list of the decisions that the conversation actually settled. Do not invent decisions to fill the section. This can include:
 
 - The modules that will be built/modified
 - The interfaces of those modules that will be modified
