@@ -54,6 +54,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "opus[1m]",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -61,7 +62,8 @@
   "enabledPlugins": {
     "laravel-simplifier@laravel": true,
     "agent-browser@agent-browser": true,
-    "n8n-mcp-skills@n8n-mcp-skills": true
+    "n8n-mcp-skills@n8n-mcp-skills": true,
+    "swift-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "agent-browser": {
@@ -83,9 +85,10 @@
       }
     }
   },
+  "outputStyle": "Simplified Technical English",
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto",
-  "tui": "fullscreen"
+  "theme": "auto"
 }

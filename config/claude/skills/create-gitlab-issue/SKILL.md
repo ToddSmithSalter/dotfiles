@@ -66,8 +66,8 @@ As a <role>, I want <capability> so that <benefit>.
 <What to build or change, and why. Enough for someone else to pick it up cold.>
 
 ## Acceptance Criteria
-- [ ] <Observable, testable condition>
-- [ ] <Observable, testable condition>
+- <Observable, testable condition>
+- <Observable, testable condition>
 
 ## Technical Notes
 <Optional. Implementation hints, relevant files, constraints, dependencies.>
