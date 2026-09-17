@@ -88,7 +88,14 @@
   "outputStyle": "Simplified Technical English",
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "effortLevel": "high"
+    }
+  },
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto"
+  "theme": "auto",
+  "hooks": {"SessionStart":[{"matcher":"*","hooks":[{"type":"command","command":"bash '/Users/todd/.claude/hooks/herdr-agent-state.sh' session","timeout":10}]}]}
 }
