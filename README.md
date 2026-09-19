@@ -46,7 +46,6 @@ Configuration, agents, and skills for [Claude Code](https://claude.ai/claude-cod
 
 - `AGENTS.md` - Global instructions and coding standards, linked to `~/.claude/CLAUDE.md` for Claude Code and to `~/.codex/AGENTS.md` for Codex
 - `settings.json` - Claude Code settings including permissions, MCP plugins, and status line configuration
-- `laravel-php-guidelines.md` - PHP and Laravel coding guidelines referenced by agents
 - `statusline.sh` - Custom status line script displayed in the Claude Code terminal
 
 **Agents** (`config/claude/agents/`) - Specialized sub-agents for focused tasks:
