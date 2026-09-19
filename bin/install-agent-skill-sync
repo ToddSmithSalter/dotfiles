@@ -1,0 +1,47 @@
+#!/bin/bash
+# Install the per-user macOS job that keeps the Codex skill links current.
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+LABEL="com.teleoinc.agent-skill-sync"
+PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
+DOMAIN="gui/$(id -u)"
+
+if [ "$(uname -s)" != Darwin ]; then
+    echo "Automatic skill linking requires macOS; run bin/link-agent-skills manually."
+    exit 0
+fi
+
+"$DOTFILES/bin/link-agent-skills"
+
+mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"
+python3 - "$DOTFILES" "$HOME" "${CODEX_HOME:-$HOME/.codex}" "$PLIST" "$LABEL" <<'PY'
+import plistlib
+import sys
+from pathlib import Path
+
+dotfiles, user_home, codex_dir, plist, label = sys.argv[1:]
+configuration = {
+    "Label": label,
+    "ProgramArguments": ["/bin/bash", f"{dotfiles}/bin/link-agent-skills"],
+    "EnvironmentVariables": {
+        "DOTFILES": dotfiles,
+        "CODEX_HOME": codex_dir,
+        "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+    },
+    "RunAtLoad": True,
+    "WatchPaths": [f"{dotfiles}/config/claude/skills"],
+    # WatchPaths is not recursive. Also catch SKILL.md added to an existing folder.
+    "StartInterval": 60,
+    "StandardErrorPath": f"{user_home}/Library/Logs/{label}.log",
+}
+Path(plist).write_bytes(plistlib.dumps(configuration))
+PY
+
+plutil -lint "$PLIST"
+if launchctl print "$DOMAIN/$LABEL" >/dev/null 2>&1; then
+    launchctl bootout "$DOMAIN/$LABEL"
+fi
+launchctl bootstrap "$DOMAIN" "$PLIST"
+echo "Automatic skill linking enabled at login, on directory changes, and every 60 seconds."
