@@ -43,7 +43,7 @@ DOTFILES="$HOME/.dotfiles"
 if [ ! -d "$DOTFILES" ]; then
     # Try to detect if script is in a dotfiles directory
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    if [ -f "$SCRIPT_DIR/../config/claude/CLAUDE.md" ]; then
+    if [ -f "$SCRIPT_DIR/../config/claude/AGENTS.md" ]; then
         DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd)"
     fi
 fi
@@ -54,7 +54,9 @@ if [ -d "$DOTFILES/config/claude" ]; then
     mkdir -p ~/.claude
 
     # Symlink configuration files
-    ln -sf "$DOTFILES/config/claude/CLAUDE.md" ~/.claude/CLAUDE.md
+    # Claude Code reads CLAUDE.md, not AGENTS.md, so it gets a symlink under the
+    # name it expects. Codex reads AGENTS.md. One file, both harnesses.
+    ln -sf "$DOTFILES/config/claude/AGENTS.md" ~/.claude/CLAUDE.md
     ln -sf "$DOTFILES/config/claude/laravel-php-guidelines.md" ~/.claude/laravel-php-guidelines.md
     ln -sf "$DOTFILES/config/claude/settings.json" ~/.claude/settings.json
     ln -sf "$DOTFILES/config/claude/statusline.sh" ~/.claude/statusline.sh
@@ -66,6 +68,10 @@ if [ -d "$DOTFILES/config/claude" ]; then
     # Symlink entire agents directory
     rm -rf ~/.claude/agents
     ln -sf "$DOTFILES/config/claude/agents" ~/.claude/agents
+
+    # Give Codex the same instructions. Codex reads ~/.codex/AGENTS.md.
+    mkdir -p ~/.codex
+    ln -sf "$DOTFILES/config/claude/AGENTS.md" ~/.codex/AGENTS.md
 
     success "Claude Code configured"
 else
