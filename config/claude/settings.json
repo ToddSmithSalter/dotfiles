@@ -1,15 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Skill(ray-skill:*)",
+      "Skill(ray:*)",
       "Skill(fix-gitlab-issue:*)",
       "Skill(php-guidelines-from-spatie:*)",
       "Skill(agent-browser:*)",
       "Bash(gh:*)",
       "Bash(glab:*)",
+      "Bash(mailcoach:*)",
       "Bash(curl:*)",
       "Bash(composer:*)",
       "Bash(vendor/bin/phpunit:*)",
+      "Bash(vendor/bin/pest:*)",
       "Bash(git:*)",
       "Bash(php artisan:*)",
       "Bash(npm:*)",
@@ -52,9 +54,40 @@
       "mcp__laravel-boost__*",
       "mcp__chrome-devtools__*"
     ],
+    "ask": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(**/.env)",
+      "Read(**/.env.*)"
+    ],
     "defaultMode": "acceptEdits"
   },
   "model": "opus[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/todd/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "skillOverrides": {
+    "simplify": "user-invocable-only",
+    "update-config": "user-invocable-only",
+    "keybindings-help": "user-invocable-only",
+    "fewer-permission-prompts": "user-invocable-only",
+    "loop": "user-invocable-only",
+    "schedule": "user-invocable-only",
+    "run": "user-invocable-only",
+    "init": "user-invocable-only"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -63,7 +96,8 @@
     "laravel-simplifier@laravel": true,
     "agent-browser@agent-browser": true,
     "n8n-mcp-skills@n8n-mcp-skills": true,
-    "swift-lsp@claude-plugins-official": true
+    "swift-lsp@claude-plugins-official": true,
+    "airtable@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "agent-browser": {
@@ -91,11 +125,13 @@
   "modelSettings": {
     "claude-sonnet-5": {
       "effortLevel": "high"
+    },
+    "claude-opus-5": {
+      "effortLevel": "medium"
     }
   },
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto",
-  "hooks": {"SessionStart":[{"matcher":"*","hooks":[{"type":"command","command":"bash '/Users/todd/.claude/hooks/herdr-agent-state.sh' session","timeout":10}]}]}
+  "theme": "auto"
 }
