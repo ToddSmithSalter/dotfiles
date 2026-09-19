@@ -1,0 +1,72 @@
+#!/bin/bash
+# Share the skills in this repository with Codex.
+# Claude Code links the whole source directory. Codex gets one link per skill,
+# so its own skills stay in place next to them.
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+SOURCE="$DOTFILES/config/claude/skills"
+CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
+TARGET_DIR="$CODEX_DIR/skills"
+BACKUP_DIR=""
+
+# Skills that Codex cannot act on. find-skills installs Claude Code skills.
+# codiff belongs to the Codiff app and is a symlink into the app bundle.
+SKIP="find-skills codiff"
+
+link_skill() {
+    local source="$1" target="$2"
+
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        return
+    fi
+
+    # Keep anything that is already there, so nothing is lost.
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        if [ -z "$BACKUP_DIR" ]; then
+            mkdir -p "$CODEX_DIR/skill-backups"
+            BACKUP_DIR="$(mktemp -d "$CODEX_DIR/skill-backups/link-agent-skills.XXXXXX")"
+        fi
+        mv "$target" "$BACKUP_DIR/$(basename "$target")"
+        echo "Preserved $target in $BACKUP_DIR"
+    fi
+
+    ln -s "$source" "$target"
+}
+
+if [ ! -d "$SOURCE" ]; then
+    echo "No skills directory at $SOURCE" >&2
+    exit 1
+fi
+
+mkdir -p "$TARGET_DIR"
+
+# Remove only the links that this script made, and only when the source is gone.
+for target in "$TARGET_DIR"/*; do
+    [ -L "$target" ] || continue
+    skill="$(basename "$target")"
+    [ "$(readlink "$target")" = "$SOURCE/$skill" ] || continue
+    if [ ! -f "$SOURCE/$skill/SKILL.md" ]; then
+        rm "$target"
+        echo "Removed stale link $target"
+    fi
+done
+
+linked=0
+skipped=0
+for entry in "$SOURCE"/*; do
+    # No SKILL.md means it is not a skill. This also excludes the synced folder.
+    [ -f "$entry/SKILL.md" ] || continue
+
+    skill="$(basename "$entry")"
+    if [[ " $SKIP " == *" $skill "* ]]; then
+        skipped=$((skipped + 1))
+        continue
+    fi
+
+    link_skill "$entry" "$TARGET_DIR/$skill"
+    linked=$((linked + 1))
+done
+
+echo "Linked $linked skills into $TARGET_DIR ($skipped skipped)"

@@ -73,6 +73,11 @@ if [ -d "$DOTFILES/config/claude" ]; then
     mkdir -p ~/.codex
     ln -sf "$DOTFILES/config/claude/AGENTS.md" ~/.codex/AGENTS.md
 
+    # Give Codex the same skills, one link per skill.
+    if [ -x "$DOTFILES/bin/link-agent-skills" ]; then
+        DOTFILES="$DOTFILES" "$DOTFILES/bin/link-agent-skills"
+    fi
+
     success "Claude Code configured"
 else
     warn "Dotfiles directory not found, skipping configuration"
