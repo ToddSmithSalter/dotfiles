@@ -64,6 +64,16 @@
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
+  "skillOverrides": {
+    "simplify": "user-invocable-only",
+    "update-config": "user-invocable-only",
+    "keybindings-help": "user-invocable-only",
+    "fewer-permission-prompts": "user-invocable-only",
+    "loop": "user-invocable-only",
+    "schedule": "user-invocable-only",
+    "run": "user-invocable-only",
+    "init": "user-invocable-only"
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -78,16 +88,6 @@
       }
     ]
   },
-  "skillOverrides": {
-    "simplify": "user-invocable-only",
-    "update-config": "user-invocable-only",
-    "keybindings-help": "user-invocable-only",
-    "fewer-permission-prompts": "user-invocable-only",
-    "loop": "user-invocable-only",
-    "schedule": "user-invocable-only",
-    "run": "user-invocable-only",
-    "init": "user-invocable-only"
-  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -97,7 +97,9 @@
     "agent-browser@agent-browser": true,
     "n8n-mcp-skills@n8n-mcp-skills": true,
     "swift-lsp@claude-plugins-official": true,
-    "airtable@claude-plugins-official": true
+    "airtable@claude-plugins-official": true,
+    "php-lsp@claude-plugins-official": true,
+    "laravel@laravel": true
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
