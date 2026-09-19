@@ -33,6 +33,8 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 
 - `bin/install` - Full Mac setup script run on a new machine, symlinks everything in `home/` into `$HOME`
 - `bin/install-claude-code` - Standalone script to install and configure Claude Code independently
+- `bin/link-agent-skills` - Links each skill into `~/.codex/skills`, so Codex has the same skills as Claude Code
+- `bin/install-agent-skill-sync` - Installs a launchd job that runs `bin/link-agent-skills` at login, on a change, and every 60 seconds
 - `bin/update` - Updates dotfiles and installed packages
 - `bin/db-dump` - Dumps Herd-managed MySQL and PostgreSQL databases before wiping a machine
 
@@ -48,6 +50,13 @@ Configuration, agents, and skills for [Claude Code](https://claude.ai/claude-cod
 - `settings.json` - Claude Code settings including permissions, MCP plugins, and status line configuration
 - `statusline.sh` - Custom status line script displayed in the Claude Code terminal
 
+**Shared with Codex** - One source, two tools:
+
+- `AGENTS.md` carries the name that Codex expects. Claude Code reads `CLAUDE.md`, so it gets a symlink under that name.
+- `bin/link-agent-skills` makes one symlink per skill in `~/.codex/skills`, so the skills that Codex already has stay in place. A folder without a `SKILL.md` is not a skill. `find-skills` and `codiff` are skipped, because Codex cannot act on them.
+- `bin/install-agent-skill-sync` keeps those links current with a launchd job. `bin/install-claude-code` runs it.
+- `config/claude/skills/synced/` holds skills that Claude Code syncs from the Anthropic skills directory. Git ignores that folder, because the app regenerates it.
+
 **Agents** (`config/claude/agents/`) - Specialized sub-agents for focused tasks:
 
 - `laravel-debugger` - Diagnoses and fixes Laravel application issues
@@ -58,26 +67,44 @@ Configuration, agents, and skills for [Claude Code](https://claude.ai/claude-cod
 
 | Skill | Purpose |
 |---|---|
-| `agent-browser` | Browser automation via AI agent |
+| `code-review` | Review changes since a commit, against standards and against the spec |
+| `codebase-design` | Vocabulary and method for designing deep modules |
+| `create-gitlab-issue` | Write a structured GitLab issue with `glab` |
+| `diagnosing-bugs` | Diagnosis loop for hard bugs and performance regressions |
 | `docker-expert` | Docker containerization guidance |
+| `domain-modeling` | Build a domain model, a CONTEXT.md, and ADRs |
 | `find-skills` | Discover and install new skills |
 | `fix-gitlab-issue` | Fix a GitLab issue and open an MR |
-| `frontend-design` | Build polished frontend UI components |
 | `gitlab-ci-patterns` | GitLab CI/CD pipeline patterns |
 | `gitlab-cli-skills` | GitLab CLI (`glab`) command reference |
-| `grill-me` | Stress-test a plan through relentless questioning |
-| `laravel-inertia-vuejs-structure` | Frontend structure conventions for Laravel Inertia + Vue |
+| `grill-me` | A relentless interview to sharpen a plan or design |
+| `grill-with-docs` | The same interview, which also writes ADRs and a glossary |
+| `grilling` | Stress-test a plan, decision, or idea |
+| `handoff` | Compact the conversation into a handoff document |
+| `implement` | Implement work from a GitLab spec issue or a set of tickets |
+| `improve-codebase-architecture` | Report deepening opportunities, then grill through them |
+| `laravel-inertia-vuejs-structure` | Frontend structure conventions for Laravel Inertia and Vue |
 | `laravel-specialist` | Laravel 10+ application building |
+| `mailcoach` | Manage email marketing with the Mailcoach CLI |
+| `modern-web-guidance` | Current best practice for HTML, CSS, and client-side JS |
 | `pdf` | Read, create, and manipulate PDF files |
 | `php-guidelines-from-spatie` | Spatie PHP and Laravel coding guidelines |
-| `prd-to-issues` | Break a PRD into GitLab issues |
+| `prototype` | Build a throwaway prototype to answer a design question |
 | `ray` | Interact with the Ray debugging application |
-| `skill-creator` | Create and improve skills |
-| `ubiquitous-language` | Build a DDD glossary from a conversation |
+| `skill-creator` | Create, improve, and measure skills |
+| `tdd` | Test-driven development, red to green to refactor |
+| `teach` | Teach a new skill or concept inside this workspace |
+| `to-questionnaire` | Turn an open decision into a questionnaire for someone else |
+| `to-spec` | Turn the conversation into a spec, published as a GitLab issue |
+| `to-tickets` | Break a plan into tracer-bullet tickets with declared blockers |
+| `triage` | Move GitLab issues and merge requests through triage roles |
+| `unslop` | Cut AI tells from any writing |
+| `use-spark` | Read Spark email, calendar, and contacts from the CLI |
 | `vue-best-practices` | Vue 3 Composition API best practices |
 | `vueuse-functions` | Apply VueUse composables in Vue projects |
-| `web-design-guidelines` | Audit UI for accessibility and design best practices |
-| `write-a-prd` | Write a PRD via interview and submit as a GitLab issue |
+| `wait-what` | Re-pitch a message that did not land |
+| `wizard` | Generate a bash wizard for steps only a human can perform |
+| `writing-for-agents` | Write skills, AGENTS.md, and CLAUDE.md for agents |
 
 ## Steps to Setup your Mac
 
