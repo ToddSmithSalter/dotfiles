@@ -1,4 +1,5 @@
 {
+  "cleanupPeriodDays": 365,
   "permissions": {
     "allow": [
       "Skill(ray:*)",
@@ -51,8 +52,7 @@
       "Bash(codiff:*)",
       "WebSearch",
       "WebFetch",
-      "mcp__laravel-boost__*",
-      "mcp__chrome-devtools__*"
+      "mcp__laravel-boost__*"
     ],
     "ask": [
       "Read(~/.ssh/**)",
@@ -61,7 +61,7 @@
       "Read(**/.env)",
       "Read(**/.env.*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "hooks": {
@@ -99,39 +99,11 @@
     "swift-lsp@claude-plugins-official": true,
     "airtable@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {
-    "agent-browser": {
-      "source": {
-        "source": "github",
-        "repo": "vercel-labs/agent-browser"
-      }
-    },
-    "laravel": {
-      "source": {
-        "source": "github",
-        "repo": "laravel/claude-code"
-      }
-    },
-    "n8n-mcp-skills": {
-      "source": {
-        "source": "github",
-        "repo": "czlonkowski/n8n-skills"
-      }
-    }
-  },
-  "outputStyle": "Simplified Technical English",
   "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
-  "modelSettings": {
-    "claude-sonnet-5": {
-      "effortLevel": "high"
-    },
-    "claude-opus-5": {
-      "effortLevel": "medium"
-    }
-  },
+  "effortLevel": "high",
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto"
+  "theme": "auto",
+  "remoteControlAtStartup": true
 }
