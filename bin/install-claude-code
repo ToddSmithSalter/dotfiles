@@ -72,6 +72,7 @@ if [ -d "$DOTFILES/config/claude" ]; then
     # Give Codex the same instructions. Codex reads ~/.codex/AGENTS.md.
     mkdir -p ~/.codex
     ln -sf "$DOTFILES/config/claude/AGENTS.md" ~/.codex/AGENTS.md
+    ln -sf "$DOTFILES/config/claude/laravel-php-guidelines.md" ~/.codex/laravel-php-guidelines.md
 
     # Give Codex the same skills, one link per skill.
     if [ -x "$DOTFILES/bin/link-agent-skills" ]; then
