@@ -40,6 +40,7 @@ brew 'git-delta'
 brew 'fzf'
 brew 'jq'
 brew 'yq'
+brew 'glow' # Render Markdown in the terminal
 
 # Apps
 cask '1password'
