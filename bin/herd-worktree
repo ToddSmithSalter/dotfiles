@@ -49,6 +49,22 @@ env_set() {
     fi
 }
 
+# True when node_modules/.package-lock.json (what npm installed) has every
+# package in package-lock.json at the same version. Optional packages for
+# other platforms are never installed, so their absence does not count.
+npm_in_sync() {
+    [ -f "$2" ] || return 1
+    node -e '
+        const fs = require("fs");
+        const want = JSON.parse(fs.readFileSync(process.argv[1])).packages || {};
+        const have = JSON.parse(fs.readFileSync(process.argv[2])).packages || {};
+        for (const [path, pkg] of Object.entries(want)) {
+            if (path === "" || (pkg.optional && !have[path])) continue;
+            if (!have[path] || have[path].version !== pkg.version) process.exit(1);
+        }
+    ' "$1" "$2" 2>/dev/null
+}
+
 regex_escape() { printf '%s' "$1" | sed 's/[.[\*^$/|]/\\&/g'; }
 
 worktree="$(git rev-parse --show-toplevel 2>/dev/null)" || error "Not inside a git repository"
@@ -118,42 +134,46 @@ setup() {
         fi
     done
 
-    # cp -c makes APFS clones: instant, and they share disk blocks with the
-    # main worktree until either copy changes a file.
-    step "Cloning dependencies from $main"
-    cloned=""
-    for dir in vendor node_modules; do
-        if [ -d "$dir" ]; then
-            success "$dir/ already exists, keeping it"
-        elif [ -d "$main/$dir" ]; then
-            cp -cR "$main/$dir" "$dir"
-            cloned="$cloned $dir"
-            success "Cloned $dir/"
-        fi
-    done
+    # Each tracked lock file, at the root or one folder down (frontend/, say),
+    # gets its dependencies next to it. cp -c makes APFS clones of the main
+    # worktree's copy: instant, and they share disk blocks until either copy
+    # changes a file. The main worktree's folder can be out of date, or the
+    # branch can pin other versions, so a clone is then checked against this
+    # worktree's lock file. A dependency folder that is already here is left
+    # alone, so re-runs stay fast.
+    step "Setting up dependencies"
+    locks="$(git ls-files -- composer.lock '*/composer.lock' package-lock.json '*/package-lock.json' \
+        pnpm-lock.yaml '*/pnpm-lock.yaml' yarn.lock '*/yarn.lock' bun.lock '*/bun.lock' | awk -F/ 'NF <= 2')"
+    for lock in $locks; do
+        dir="$(dirname "$lock")"
+        case "$lock" in */composer.lock|composer.lock) deps="vendor" ;; *) deps="node_modules" ;; esac
+        [ "$dir" = "." ] && target="$deps" || target="$dir/$deps"
 
-    # A branch can pin different versions than the main worktree has installed,
-    # so a fresh clone gets reinstalled when the lock files differ. A directory
-    # that was already here is left alone, so re-runs stay fast.
-    needs_install() { [ ! -d "$1" ] || { [[ "$cloned" == *" $1"* ]] && ! cmp -s "$2" "$main/$2"; }; }
-    if [ -f composer.json ] && needs_install vendor composer.lock; then
-        step "Installing Composer dependencies from composer.lock"
-        "$HERD_BIN/php" "$HERD_BIN/composer" install --no-interaction --quiet
-        success "Composer dependencies installed"
-    fi
-    for lock in package-lock.json pnpm-lock.yaml yarn.lock bun.lock; do
-        [ -f "$lock" ] || continue
-        if needs_install node_modules "$lock"; then
-            step "Installing Node dependencies from $lock"
-            case "$lock" in
-                package-lock.json) npm ci --silent ;;
-                pnpm-lock.yaml) pnpm install --frozen-lockfile --silent ;;
-                yarn.lock) yarn install --frozen-lockfile --silent ;;
-                bun.lock) bun install --frozen-lockfile --silent ;;
-            esac
-            success "Node dependencies installed"
+        if [ -d "$target" ]; then
+            success "$target/ already exists, keeping it"
+            continue
         fi
-        break
+        if [ -d "$main/$target" ]; then
+            cp -cR "$main/$target" "$target"
+            success "Cloned $target/"
+        fi
+
+        case "$lock" in
+            *composer.lock)
+                # Fast when vendor/ already matches the lock file.
+                "$HERD_BIN/php" "$HERD_BIN/composer" install --working-dir="$dir" --no-interaction --quiet
+                ;;
+            *package-lock.json)
+                # npm ci always deletes node_modules/ first, so only run it when
+                # npm's record of what it installed differs from the lock file.
+                npm_in_sync "$lock" "$target/.package-lock.json" && { success "$target/ matches $lock"; continue; }
+                (cd "$dir" && npm ci --silent)
+                ;;
+            *pnpm-lock.yaml) (cd "$dir" && pnpm install --frozen-lockfile --silent) ;;
+            *yarn.lock) (cd "$dir" && yarn install --frozen-lockfile --silent) ;;
+            *bun.lock) (cd "$dir" && bun install --frozen-lockfile --silent) ;;
+        esac
+        success "Installed $target/ from $lock"
     done
 
     step "Copying the database"
