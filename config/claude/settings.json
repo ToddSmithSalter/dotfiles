@@ -63,7 +63,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "skillOverrides": {
     "simplify": "user-invocable-only",
     "update-config": "user-invocable-only",
@@ -108,7 +108,7 @@
   "effortLevel": "high",
   "modelSettings": {
     "claude-opus-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "medium"
     }
   },
   "tui": "fullscreen",
@@ -116,6 +116,5 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "remoteControlAtStartup": true,
-  "agentPushNotifEnabled": true,
-  "disableClaudeAiConnectors": true
+  "agentPushNotifEnabled": true
 }
