@@ -13,3 +13,6 @@ config/Brewfile.lock.json
 
 # Claude skills synced from the Anthropic skills directory
 config/claude/skills/synced/
+
+# Skills deleted from the skills directory, kept until emptied
+config/claude/skills/.trash/
