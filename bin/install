@@ -71,6 +71,18 @@ fi
 nvm install --lts && nvm alias default 'lts/*' || warn "Node LTS installation failed"
 success "nvm and Node LTS installed"
 
+# Twilio CLI - installed into the current nvm Node, so reinstall after changing the default Node
+step "Installing Twilio CLI"
+npm install -g twilio-cli || warn "Twilio CLI installation failed"
+success "Twilio CLI processed"
+
+# Vite+ - its installer appends a line to the local ~/.zshrc
+step "Installing Vite+"
+if ! command -v vp &>/dev/null && [ ! -x "$HOME/.local/share/vite-plus/bin/vp" ]; then
+    curl -fsSL https://vite.plus | bash || warn "Vite+ installation failed"
+fi
+success "Vite+ processed"
+
 # Update Homebrew recipes
 brew update
 
