@@ -322,21 +322,29 @@ setup() {
 # PIDs of processes whose working directory is in this worktree, except this
 # script and the processes that started it.
 worktree_pids() {
-    # This function runs in a subshell, and lsof and awk are its children.
-    self="$(sh -c 'echo $PPID')"
-    keep=" $self "
+    keep=" "
     pid=$$
     while [ "$pid" -gt 1 ] 2>/dev/null; do
         keep="$keep$pid "
         pid="$(ps -o ppid= -p "$pid" | tr -d ' ')"
     done
-    lsof -d cwd -FpRn 2>/dev/null | awk -v dir="$worktree" -v keep="$keep" -v self="$self" '
+    lsof -d cwd -Fpn 2>/dev/null | awk -v dir="$worktree" -v keep="$keep" '
         /^p/ { pid = substr($0, 2) }
-        /^R/ { ppid = substr($0, 2) }
         /^n/ {
             path = substr($0, 2)
-            if ((path == dir || index(path, dir "/") == 1) && index(keep, " " pid " ") == 0 && ppid != self) print pid
+            if ((path == dir || index(path, dir "/") == 1) && index(keep, " " pid " ") == 0) print pid
         }'
+}
+
+# Set pids to the PIDs in $@ that still run. Subshells of this script are in
+# the worktree too, but have exited by now. This must not run in a subshell,
+# or it would find itself.
+keep_running() {
+    pids=""
+    for pid in "$@"; do
+        if kill -0 "$pid" 2>/dev/null; then pids="$pids $pid"; fi
+    done
+    pids="${pids# }"
 }
 
 teardown() {
@@ -346,7 +354,7 @@ teardown() {
     # Bloom deletes the worktree. Bloom then finds a folder that git does not
     # know and refuses to archive it.
     step "Stopping processes in the worktree"
-    pids="$(worktree_pids)"
+    keep_running $(worktree_pids)
     if [ -z "$pids" ]; then
         success "No process runs in this worktree"
     else
@@ -355,7 +363,7 @@ teardown() {
         done
         kill $pids 2>/dev/null || true
         for _ in 1 2 3 4 5 6 7 8 9 10; do
-            pids="$(for pid in $pids; do kill -0 "$pid" 2>/dev/null && echo "$pid"; done)"
+            keep_running $pids
             [ -z "$pids" ] && break
             sleep 0.5
         done
