@@ -16,7 +16,8 @@
 #
 # Usage (from inside the worktree):
 #   herd-worktree setup      Safe to re-run. Keeps an existing database.
-#   herd-worktree teardown   Drop the worktree's database and unlink its site.
+#   herd-worktree teardown   Stop processes that run in the worktree, drop its
+#                            database, and unlink its site.
 #
 # FRESH_DB=1 herd-worktree setup  drops and re-copies the worktree's database.
 # HERD_WORKTREE_SUBDOMAINS="my api" herd-worktree setup  also links subdomains
@@ -318,8 +319,49 @@ setup() {
     success "Worktree ready: ${scheme:-http}://$new_host"
 }
 
+# PIDs of processes whose working directory is in this worktree, except this
+# script and the processes that started it.
+worktree_pids() {
+    # This function runs in a subshell, and lsof and awk are its children.
+    self="$(sh -c 'echo $PPID')"
+    keep=" $self "
+    pid=$$
+    while [ "$pid" -gt 1 ] 2>/dev/null; do
+        keep="$keep$pid "
+        pid="$(ps -o ppid= -p "$pid" | tr -d ' ')"
+    done
+    lsof -d cwd -FpRn 2>/dev/null | awk -v dir="$worktree" -v keep="$keep" -v self="$self" '
+        /^p/ { pid = substr($0, 2) }
+        /^R/ { ppid = substr($0, 2) }
+        /^n/ {
+            path = substr($0, 2)
+            if ((path == dir || index(path, dir "/") == 1) && index(keep, " " pid " ") == 0 && ppid != self) print pid
+        }'
+}
+
 teardown() {
     current_db="$(env_get .env DB_DATABASE)"
+
+    # A dev server that still runs (vite, say) writes its cache back after
+    # Bloom deletes the worktree. Bloom then finds a folder that git does not
+    # know and refuses to archive it.
+    step "Stopping processes in the worktree"
+    pids="$(worktree_pids)"
+    if [ -z "$pids" ]; then
+        success "No process runs in this worktree"
+    else
+        for pid in $pids; do
+            echo "  $pid $(ps -o command= -p "$pid" 2>/dev/null | cut -c1-100)"
+        done
+        kill $pids 2>/dev/null || true
+        for _ in 1 2 3 4 5 6 7 8 9 10; do
+            pids="$(for pid in $pids; do kill -0 "$pid" 2>/dev/null && echo "$pid"; done)"
+            [ -z "$pids" ] && break
+            sleep 0.5
+        done
+        [ -z "$pids" ] || kill -9 $pids 2>/dev/null || true
+        success "Stopped the processes"
+    fi
 
     step "Dropping the database"
     case "$db_connection" in
