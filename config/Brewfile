@@ -41,6 +41,7 @@ brew 'fzf'
 brew 'jq'
 brew 'yq'
 brew 'glow' # Render Markdown in the terminal
+brew 'herdr' # Agent multiplexer for the terminal
 
 # Apps
 cask '1password'
