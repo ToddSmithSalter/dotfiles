@@ -1,18 +1,19 @@
 #!/bin/bash
 #
-# Make a git worktree of a Herd-served Laravel app run on its own: copy .env
-# from the main worktree, clone vendor/ and node_modules/, copy the database
-# into a new one, and link the worktree as its own Herd site.
+# Make a git worktree of a Herd-served Laravel app run on its own: clone
+# vendor/ and node_modules/, copy the database into a new one, and link the
+# worktree as its own Herd site.
 #
-# Built for Bloom, which creates a worktree for every workspace. Point a repo
-# at it from .bloom/settings.local.toml in the main worktree:
+# Built for Bloom, which creates a worktree for every workspace and copies the
+# .env* files into it before this runs. Point a repo at it from
+# .bloom/settings.local.toml in the main worktree:
 #
 #   [scripts]
 #   setup = "/Users/todd/.dotfiles/bin/herd-worktree setup"
 #   archive = "/Users/todd/.dotfiles/bin/herd-worktree teardown"
 #
 # Usage (from inside the worktree):
-#   herd-worktree setup      Safe to re-run. Keeps an existing .env and database.
+#   herd-worktree setup      Safe to re-run. Keeps an existing database.
 #   herd-worktree teardown   Drop the worktree's database and unlink its site.
 #
 # FRESH_DB=1 herd-worktree setup  drops and re-copies the worktree's database.
@@ -124,15 +125,7 @@ db_copy() {
 }
 
 setup() {
-    step "Copying environment files from $main"
-    for f in .env .env.testing; do
-        if [ -f "$f" ]; then
-            success "$f already exists, keeping it"
-        elif [ -f "$main/$f" ]; then
-            cp "$main/$f" "$f"
-            success "Copied $f"
-        fi
-    done
+    [ -f .env ] || error "No .env in this worktree ($worktree). Bloom copies it before setup runs."
 
     # Each tracked lock file, at the root or one folder down (frontend/, say),
     # gets its dependencies next to it. cp -c makes APFS clones of the main
