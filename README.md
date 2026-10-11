@@ -88,6 +88,7 @@ Configuration, agents, and skills for [Claude Code](https://claude.ai/claude-cod
 | `laravel-specialist` | Laravel 10+ application building |
 | `mailcoach` | Manage email marketing with the Mailcoach CLI |
 | `modern-web-guidance` | Current best practice for HTML, CSS, and client-side JS |
+| `mr` | Open a GitLab merge request with a body that is fast to review |
 | `pdf` | Read, create, and manipulate PDF files |
 | `php-guidelines-from-spatie` | Spatie PHP and Laravel coding guidelines |
 | `prototype` | Build a throwaway prototype to answer a design question |

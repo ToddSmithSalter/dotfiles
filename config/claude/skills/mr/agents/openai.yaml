@@ -1,0 +1,5 @@
+interface:
+  display_name: "MR"
+  short_description: "Open a GitLab merge request that's fast to review"
+policy:
+  allow_implicit_invocation: false
