@@ -1,5 +1,5 @@
 term = xterm-256color
-working-directory = /Users/todd/herd
+working-directory = /Users/todd
 cursor-style = block
 shell-integration-features = no-cursor
 palette = 2=#5ccd86
