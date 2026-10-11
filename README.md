@@ -37,6 +37,7 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 - `bin/install-agent-skill-sync` - Installs a launchd job that runs `bin/link-agent-skills` at login, on a change, and every 60 seconds
 - `bin/update` - Updates dotfiles and installed packages
 - `bin/db-dump` - Dumps Herd-managed MySQL and PostgreSQL databases before wiping a machine
+- `bin/herd-worktree` - Sets up a git worktree of a Herd Laravel app (copies `.env`, clones `vendor/` and `node_modules/`, copies the database, links the Herd site), and tears it down again. Bloom runs it from each repo's `.bloom/settings.local.toml`
 
 ### VS Code
 

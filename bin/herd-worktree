@@ -1,0 +1,264 @@
+#!/bin/bash
+#
+# Make a git worktree of a Herd-served Laravel app run on its own: copy .env
+# from the main worktree, clone vendor/ and node_modules/, copy the database
+# into a new one, and link the worktree as its own Herd site.
+#
+# Built for Bloom, which creates a worktree for every workspace. Point a repo
+# at it from .bloom/settings.local.toml in the main worktree:
+#
+#   [scripts]
+#   setup = "/Users/todd/.dotfiles/bin/herd-worktree setup"
+#   archive = "/Users/todd/.dotfiles/bin/herd-worktree teardown"
+#
+# Usage (from inside the worktree):
+#   herd-worktree setup      Safe to re-run. Keeps an existing .env and database.
+#   herd-worktree teardown   Drop the worktree's database and unlink its site.
+#
+# FRESH_DB=1 herd-worktree setup  drops and re-copies the worktree's database.
+
+set -eo pipefail
+
+HERD_BIN="$HOME/Library/Application Support/Herd/bin"
+# Herd only symlinks psql into its convenience bin/, not pg_dump - that lives
+# under the versioned service directory instead.
+PG_BIN="$(dirname "$(ls -1 /Users/Shared/Herd/services/postgresql/*/bin/pg_dump 2>/dev/null | sort -V | tail -1)")"
+
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+step() { echo ""; echo -e "${BLUE}➜${NC} $1"; }
+success() { echo -e "${GREEN}✓${NC} $1"; }
+warn() { echo -e "${YELLOW}⚠${NC} $1"; }
+error() { echo -e "${RED}✗${NC} $1" >&2; exit 1; }
+
+# Read KEY from an env file, without surrounding quotes.
+env_get() {
+    grep -E "^$2=" "$1" 2>/dev/null | tail -1 | cut -d= -f2- | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
+}
+
+# Set KEY=value in .env, appending the key if it is missing.
+env_set() {
+    if grep -qE "^$1=" .env; then
+        sed -i '' "s|^$1=.*|$1=$2|" .env
+    else
+        printf '\n%s=%s\n' "$1" "$2" >> .env
+    fi
+}
+
+regex_escape() { printf '%s' "$1" | sed 's/[.[\*^$/|]/\\&/g'; }
+
+worktree="$(git rev-parse --show-toplevel 2>/dev/null)" || error "Not inside a git repository"
+cd "$worktree"
+main="$(git worktree list --porcelain | awk '/^worktree /{print substr($0, 10); exit}')"
+[ "$worktree" != "$main" ] || error "This is the main worktree ($main). Run this from a linked worktree."
+[ -f "$main/.env" ] || error "No .env in the main worktree ($main)"
+
+name="$(basename "$worktree")"
+site="$name"
+tld="$(env_get "$main/.env" APP_URL | sed -E 's|^[a-z]+://||; s|[:/].*$||; s|.*\.||')"
+tld="${tld:-test}"
+
+# Database settings always come from the main worktree, so a re-run still
+# knows the source database after .env here points at the copy.
+db_connection="$(env_get "$main/.env" DB_CONNECTION)"
+db_host="$(env_get "$main/.env" DB_HOST)"
+db_port="$(env_get "$main/.env" DB_PORT)"
+db_user="$(env_get "$main/.env" DB_USERNAME)"
+db_pass="$(env_get "$main/.env" DB_PASSWORD)"
+source_db="$(env_get "$main/.env" DB_DATABASE)"
+# MySQL caps database names at 64 characters and PostgreSQL at 63.
+target_db="$(printf '%s-%s' "$source_db" "$name" | cut -c1-63)"
+
+mysql_cmd() { MYSQL_PWD="$db_pass" "$HERD_BIN/mysql" -h "${db_host:-127.0.0.1}" -P "${db_port:-3306}" -u "${db_user:-root}" "$@"; }
+psql_cmd() { PGPASSWORD="$db_pass" "$PG_BIN/psql" -h "${db_host:-127.0.0.1}" -p "${db_port:-5432}" -U "${db_user:-root}" -v ON_ERROR_STOP=1 "$@"; }
+
+db_exists() {
+    case "$db_connection" in
+        mysql|mariadb) [ -n "$(mysql_cmd -N -e "SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$1'")" ] ;;
+        pgsql) [ -n "$(psql_cmd -d postgres -At -c "SELECT 1 FROM pg_database WHERE datname = '$1'")" ] ;;
+    esac
+}
+
+db_drop() {
+    case "$db_connection" in
+        mysql|mariadb) mysql_cmd -e "DROP DATABASE IF EXISTS \`$1\`" ;;
+        pgsql) psql_cmd -d postgres -q -c "DROP DATABASE IF EXISTS \"$1\" WITH (FORCE)" ;;
+    esac
+}
+
+db_copy() {
+    case "$db_connection" in
+        mysql|mariadb)
+            mysql_cmd -e "CREATE DATABASE \`$target_db\`" &&
+            MYSQL_PWD="$db_pass" "$HERD_BIN/mysqldump" -h "${db_host:-127.0.0.1}" -P "${db_port:-3306}" -u "${db_user:-root}" \
+                --single-transaction --routines --triggers --no-tablespaces "$source_db" \
+                | mysql_cmd "$target_db"
+            ;;
+        pgsql)
+            psql_cmd -d postgres -q -c "CREATE DATABASE \"$target_db\"" &&
+            PGPASSWORD="$db_pass" "$PG_BIN/pg_dump" -h "${db_host:-127.0.0.1}" -p "${db_port:-5432}" -U "${db_user:-root}" \
+                --no-owner --no-acl "$source_db" \
+                | psql_cmd -q -d "$target_db" > /dev/null
+            ;;
+    esac
+}
+
+setup() {
+    step "Copying environment files from $main"
+    for f in .env .env.testing; do
+        if [ -f "$f" ]; then
+            success "$f already exists, keeping it"
+        elif [ -f "$main/$f" ]; then
+            cp "$main/$f" "$f"
+            success "Copied $f"
+        fi
+    done
+
+    # cp -c makes APFS clones: instant, and they share disk blocks with the
+    # main worktree until either copy changes a file.
+    step "Cloning dependencies from $main"
+    cloned=""
+    for dir in vendor node_modules; do
+        if [ -d "$dir" ]; then
+            success "$dir/ already exists, keeping it"
+        elif [ -d "$main/$dir" ]; then
+            cp -cR "$main/$dir" "$dir"
+            cloned="$cloned $dir"
+            success "Cloned $dir/"
+        fi
+    done
+
+    # A branch can pin different versions than the main worktree has installed,
+    # so a fresh clone gets reinstalled when the lock files differ. A directory
+    # that was already here is left alone, so re-runs stay fast.
+    needs_install() { [ ! -d "$1" ] || { [[ "$cloned" == *" $1"* ]] && ! cmp -s "$2" "$main/$2"; }; }
+    if [ -f composer.json ] && needs_install vendor composer.lock; then
+        step "Installing Composer dependencies from composer.lock"
+        "$HERD_BIN/php" "$HERD_BIN/composer" install --no-interaction --quiet
+        success "Composer dependencies installed"
+    fi
+    for lock in package-lock.json pnpm-lock.yaml yarn.lock bun.lock; do
+        [ -f "$lock" ] || continue
+        if needs_install node_modules "$lock"; then
+            step "Installing Node dependencies from $lock"
+            case "$lock" in
+                package-lock.json) npm ci --silent ;;
+                pnpm-lock.yaml) pnpm install --frozen-lockfile --silent ;;
+                yarn.lock) yarn install --frozen-lockfile --silent ;;
+                bun.lock) bun install --frozen-lockfile --silent ;;
+            esac
+            success "Node dependencies installed"
+        fi
+        break
+    done
+
+    step "Copying the database"
+    db_ready=0
+    case "$db_connection" in
+        mysql|mariadb|pgsql)
+            if db_exists "$target_db" && [ "${FRESH_DB:-0}" != "1" ]; then
+                success "Database '$target_db' already exists, keeping it (FRESH_DB=1 re-copies it)"
+            else
+                db_drop "$target_db"
+                # Drop a half-copied database so the next run starts clean.
+                db_copy || { db_drop "$target_db"; error "Copying '$source_db' to '$target_db' failed"; }
+                success "Copied '$source_db' to '$target_db'"
+            fi
+            env_set DB_DATABASE "$target_db"
+            db_ready=1
+            ;;
+        sqlite)
+            source_file="${source_db:-database/database.sqlite}"
+            case "$source_file" in /*) ;; *) source_file="$main/$source_file" ;; esac
+            target_file="$worktree/database/$(basename "$source_file")"
+            if [ -f "$target_file" ] && [ "${FRESH_DB:-0}" != "1" ]; then
+                success "$target_file already exists, keeping it"
+            elif [ -f "$source_file" ]; then
+                cp "$source_file" "$target_file"
+                success "Copied $source_file"
+            else
+                warn "No SQLite database at $source_file, skipping"
+            fi
+            [ -n "$source_db" ] && env_set DB_DATABASE "$target_file"
+            [ -f "$target_file" ] && db_ready=1
+            ;;
+        *)
+            warn "DB_CONNECTION '$db_connection' is not supported, skipping the database"
+            ;;
+    esac
+
+    # The branch can carry migrations that the main worktree's database has
+    # not run yet. Only migrate a database that belongs to this worktree.
+    if [ -f artisan ] && [ "$db_ready" = "1" ]; then
+        step "Running migrations"
+        "$HERD_BIN/php" artisan migrate --force
+        success "Migrations ran"
+    fi
+
+    step "Linking the Herd site"
+    link="$HOME/Library/Application Support/Herd/config/valet/Sites/$site"
+    if [ -L "$link" ] && [ "$(readlink "$link")" != "$worktree" ]; then
+        error "Herd site '$site' already points at $(readlink "$link")"
+    fi
+    main_url="$(env_get "$main/.env" APP_URL)"
+    main_host="$(printf '%s' "$main_url" | sed -E 's|^[a-z]+://||; s|[:/].*$||')"
+    scheme="${main_url%%://*}"
+    if [ "$scheme" = "https" ]; then
+        "$HERD_BIN/herd" link "$site" --secure --no-interaction --quiet
+    else
+        "$HERD_BIN/herd" link "$site" --no-interaction --quiet
+    fi
+    new_host="$site.$tld"
+    # Swap the main site's host wherever .env uses it as a whole host
+    # (APP_URL, VITE_DETECT_TLS, SESSION_DOMAIN, ...), but leave other
+    # subdomains such as certs.<main host> alone.
+    if [ -n "$main_host" ]; then
+        escaped="$(regex_escape "$main_host")"
+        sed -i '' -E "s#://$escaped([:/\"]|$)#://$new_host\1#g; s#=$escaped\$#=$new_host#; s#=\"$escaped\"\$#=\"$new_host\"#" .env
+    fi
+    success "Linked ${scheme:-http}://$new_host"
+
+    echo ""
+    success "Worktree ready: ${scheme:-http}://$new_host"
+}
+
+teardown() {
+    current_db="$(env_get .env DB_DATABASE)"
+
+    step "Dropping the database"
+    case "$db_connection" in
+        mysql|mariadb|pgsql)
+            if [ -z "$current_db" ] || [ "$current_db" = "$source_db" ]; then
+                warn "This worktree uses the main worktree's database, leaving it alone"
+            elif db_exists "$current_db"; then
+                db_drop "$current_db"
+                success "Dropped '$current_db'"
+            else
+                success "Database '$current_db' does not exist"
+            fi
+            ;;
+        *)
+            success "Nothing to drop for DB_CONNECTION '$db_connection'"
+            ;;
+    esac
+
+    step "Unlinking the Herd site"
+    link="$HOME/Library/Application Support/Herd/config/valet/Sites/$site"
+    if [ -L "$link" ] && [ "$(readlink "$link")" = "$worktree" ]; then
+        "$HERD_BIN/herd" unsecure "$site.$tld" --quiet 2>/dev/null || true
+        "$HERD_BIN/herd" unlink "$site" --quiet
+        success "Unlinked $site.$tld"
+    else
+        success "No Herd site '$site' points at this worktree"
+    fi
+}
+
+case "${1:-}" in
+    setup) setup ;;
+    teardown) teardown ;;
+    *) echo "Usage: herd-worktree setup|teardown" >&2; exit 1 ;;
+esac
