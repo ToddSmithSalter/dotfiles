@@ -38,6 +38,16 @@ for file in "$DOTFILES_DIR"/home/.*; do
     success "Linked ~/$name"
 done
 
+# ~/.zshrc is a local file so installers (Herd, Vite+) don't write into the repo
+step "Creating ~/.zshrc"
+ZSHRC_LINE='source "$HOME/.dotfiles/shell/zshrc"'
+if [ -L "$HOME/.zshrc" ] || ! grep -qF "$ZSHRC_LINE" "$HOME/.zshrc" 2>/dev/null; then
+    [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ] && mv "$HOME/.zshrc" "$HOME/.zshrc.pre-dotfiles"
+    rm -f "$HOME/.zshrc"
+    printf '%s\n\n# Machine-local lines below. Installers (Herd, Vite+) append here.\n' "$ZSHRC_LINE" > "$HOME/.zshrc"
+fi
+success "Created ~/.zshrc"
+
 rm -rf "$HOME/.mackup.cfg"
 ln -sf "$DOTFILES_DIR/macos/.mackup.cfg" "$HOME/.mackup.cfg"
 success "Linked ~/.mackup.cfg"

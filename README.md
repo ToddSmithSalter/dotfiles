@@ -10,7 +10,6 @@ This repository serves as a way to help setup and maintain my Mac. Consider this
 
 Files here are symlinked directly into `$HOME` by `bin/install`.
 
-- `.zshrc` - Zsh configuration, including PATH setup, and sources `.aliases` and `.functions`
 - `.aliases` - Common shell aliases
 - `.functions` - Custom shell functions
 - `.gitconfig` - Git configuration
@@ -21,8 +20,9 @@ Files here are symlinked directly into `$HOME` by `bin/install`.
 - `.mackup.cfg` - Mackup configuration, symlinked to `$HOME/.mackup.cfg` by `bin/install`
 - `set-defaults.sh` - Configures macOS system defaults, run manually as the last setup step
 
-### Shell configuration (repo root)
+### Shell configuration
 
+- `shell/zshrc` - Zsh configuration, including PATH setup, and sources `.aliases` and `.functions`. It is not symlinked. `bin/install` writes a local `~/.zshrc` that sources it, so installers such as Herd and Vite+ append their lines to the local file, not to this repo.
 - `minimal.zsh-theme` - A minimal Zsh prompt theme
 
 ### Package management (`config/`)

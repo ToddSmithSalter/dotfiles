@@ -13,7 +13,7 @@ alias library="cd $HOME/Library"
 alias ohmyzsh="cd $HOME/.oh-my-zsh"
 
 # Configurations
-alias zshconfig="code $DOTFILES/home/.zshrc"
+alias zshconfig="code $DOTFILES/shell/zshrc"
 alias sshconfig="code $HOME/.ssh/config"
 alias gitconfig="code $DOTFILES/home/.gitconfig"
 alias aliasconfig="code $DOTFILES/home/.aliases"
