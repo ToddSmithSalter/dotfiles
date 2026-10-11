@@ -2,7 +2,9 @@
 #
 # Make a git worktree of a Herd-served Laravel app run on its own: clone
 # vendor/ and node_modules/, copy the database into a new one, and link the
-# worktree as its own Herd site.
+# worktree as its own Herd site. The site is a subdomain of the main one
+# (luzon-strait.c-trac.test for c-trac.test), so a password manager entry for
+# the main site also fills the worktree.
 #
 # Built for Bloom, which creates a worktree for every workspace and copies the
 # .env* files into it before this runs. Point a repo at it from
@@ -17,6 +19,8 @@
 #   herd-worktree teardown   Drop the worktree's database and unlink its site.
 #
 # FRESH_DB=1 herd-worktree setup  drops and re-copies the worktree's database.
+# HERD_WORKTREE_SUBDOMAINS="my api" herd-worktree setup  also links subdomains
+# that neither .env nor a Route::domain() names.
 
 set -eo pipefail
 
@@ -74,10 +78,16 @@ main="$(git worktree list --porcelain | awk '/^worktree /{print substr($0, 10); 
 [ "$worktree" != "$main" ] || error "This is the main worktree ($main). Run this from a linked worktree."
 [ -f "$main/.env" ] || error "No .env in the main worktree ($main)"
 
+main_url="$(env_get "$main/.env" APP_URL)"
+main_host="$(printf '%s' "$main_url" | sed -E 's|^[a-z]+://||; s|[:/].*$||')"
+[ -n "$main_host" ] || error "No APP_URL in the main worktree's .env"
+scheme="${main_url%%://*}"
+tld="${main_host##*.}"
 name="$(basename "$worktree")"
-site="$name"
-tld="$(env_get "$main/.env" APP_URL | sed -E 's|^[a-z]+://||; s|[:/].*$||; s|.*\.||')"
-tld="${tld:-test}"
+site="$name.${main_host%.*}"
+new_host="$name.$main_host"
+sites_dir="$HOME/Library/Application Support/Herd/config/valet/Sites"
+certs_dir="$HOME/Library/Application Support/Herd/config/valet/Certificates"
 
 # Database settings always come from the main worktree, so a re-run still
 # knows the source database after .env here points at the copy.
@@ -122,6 +132,35 @@ db_copy() {
                 | psql_cmd -q -d "$target_db" > /dev/null
             ;;
     esac
+}
+
+# Herd serves a host from the link with exactly its name, or else from the
+# link named after its last label. So certs.<site> without its own link falls
+# back to the main site. These are the subdomains that need one: hosts under
+# the main host in .env, Route::domain() prefixes in routes/, and
+# HERD_WORKTREE_SUBDOMAINS.
+subdomains() {
+    {
+        (grep -oE "[a-z0-9-]+\.$(regex_escape "$main_host")" "$main/.env" || true) | sed 's/\..*//'
+        (grep -rhoE "domain\(\s*['\"][a-z0-9-]+\." routes 2>/dev/null || true) | sed -E "s/.*['\"]//; s/\.$//"
+        printf '%s\n' ${HERD_WORKTREE_SUBDOMAINS//,/ }
+    } | sed '/^$/d' | sort -u
+}
+
+# Names of the Herd links that point at this worktree.
+linked_sites() {
+    for link in "$sites_dir"/*; do
+        if [ -L "$link" ] && [ "$(readlink "$link")" = "$worktree" ]; then
+            basename "$link"
+        fi
+    done
+}
+
+unlink_site() {
+    if [ -f "$certs_dir/$1.$tld.crt" ]; then
+        "$HERD_BIN/herd" unsecure "$1.$tld" --quiet 2>/dev/null || true
+    fi
+    "$HERD_BIN/herd" unlink "$1" --quiet
 }
 
 setup() {
@@ -212,28 +251,60 @@ setup() {
         success "Migrations ran"
     fi
 
-    step "Linking the Herd site"
-    link="$HOME/Library/Application Support/Herd/config/valet/Sites/$site"
-    if [ -L "$link" ] && [ "$(readlink "$link")" != "$worktree" ]; then
-        error "Herd site '$site' already points at $(readlink "$link")"
-    fi
-    main_url="$(env_get "$main/.env" APP_URL)"
-    main_host="$(printf '%s' "$main_url" | sed -E 's|^[a-z]+://||; s|[:/].*$||')"
-    scheme="${main_url%%://*}"
+    step "Linking the Herd sites"
+    subs="$(subdomains)"
+    names="$site"
+    for sub in $subs; do
+        # A worktree named after a subdomain would take over the main site's.
+        [ "$sub" != "$name" ] || error "The worktree name '$name' is also a subdomain of $main_host"
+        names="$names $sub.$site"
+    done
+    for n in $names; do
+        link="$sites_dir/$n"
+        if [ -L "$link" ] && [ "$(readlink "$link")" != "$worktree" ]; then
+            error "Herd site '$n' already points at $(readlink "$link")"
+        fi
+    done
+    # Remove links from an earlier scheme, such as <name>.test.
+    for n in $(linked_sites); do
+        case " $names " in
+            *" $n "*) ;;
+            *) unlink_site "$n"; success "Unlinked the old site $n.$tld" ;;
+        esac
+    done
+    secure=""
+    [ "$scheme" = "https" ] && secure="--secure"
+    "$HERD_BIN/herd" link "$site" $secure --no-interaction --quiet
+    # The site's certificate and Nginx server already cover *.<site>, so the
+    # subdomain links need no --secure.
+    for sub in $subs; do
+        "$HERD_BIN/herd" link "$sub.$site" --no-interaction --quiet
+    done
+    for n in $names; do
+        [ "$(readlink "$sites_dir/$n" 2>/dev/null)" = "$worktree" ] || error "Herd did not link $n.$tld to this worktree"
+        success "Linked ${scheme:-http}://$n.$tld"
+    done
+
+    # Move the main host, and each host under it, under the worktree's host
+    # wherever .env uses it as a whole host (APP_URL, VITE_DETECT_TLS,
+    # CALIBRATION_CERT_URL, ...). First undo an earlier run, and the
+    # <name>.<tld> host of the earlier scheme, so the host is never nested
+    # twice.
+    main_re="$(regex_escape "$main_host")"
+    sed -i '' -E \
+        -e "s#$(regex_escape "$new_host")#$main_host#g" \
+        -e "s#(://|=\"?)$(regex_escape "$name.$tld")([:/\"]|\$)#\1$main_host\2#g" \
+        -e "s#(://|=\"?\.?)(([a-z0-9-]+\.)*)$main_re([:/\"]|\$)#\1\2$new_host\4#g" \
+        .env
+
+    # laravel-vite-plugin looks for a Herd certificate named after the folder
+    # (<name>.test), which does not exist, so the dev server would fall back
+    # to http and the browser would block it as mixed content. Point it at the
+    # site's certificate instead.
     if [ "$scheme" = "https" ]; then
-        "$HERD_BIN/herd" link "$site" --secure --no-interaction --quiet
-    else
-        "$HERD_BIN/herd" link "$site" --no-interaction --quiet
+        env_set VITE_DEV_SERVER_KEY "\"$certs_dir/$new_host.key\""
+        env_set VITE_DEV_SERVER_CERT "\"$certs_dir/$new_host.crt\""
     fi
-    new_host="$site.$tld"
-    # Swap the main site's host wherever .env uses it as a whole host
-    # (APP_URL, VITE_DETECT_TLS, SESSION_DOMAIN, ...), but leave other
-    # subdomains such as certs.<main host> alone.
-    if [ -n "$main_host" ]; then
-        escaped="$(regex_escape "$main_host")"
-        sed -i '' -E "s#://$escaped([:/\"]|$)#://$new_host\1#g; s#=$escaped\$#=$new_host#; s#=\"$escaped\"\$#=\"$new_host\"#" .env
-    fi
-    success "Linked ${scheme:-http}://$new_host"
 
     # Cached config, routes, and compiled views can hold values from before
     # .env pointed at this worktree.
@@ -267,15 +338,13 @@ teardown() {
             ;;
     esac
 
-    step "Unlinking the Herd site"
-    link="$HOME/Library/Application Support/Herd/config/valet/Sites/$site"
-    if [ -L "$link" ] && [ "$(readlink "$link")" = "$worktree" ]; then
-        "$HERD_BIN/herd" unsecure "$site.$tld" --quiet 2>/dev/null || true
-        "$HERD_BIN/herd" unlink "$site" --quiet
-        success "Unlinked $site.$tld"
-    else
-        success "No Herd site '$site' points at this worktree"
-    fi
+    step "Unlinking the Herd sites"
+    linked="$(linked_sites)"
+    [ -n "$linked" ] || success "No Herd site points at this worktree"
+    for n in $linked; do
+        unlink_site "$n"
+        success "Unlinked $n.$tld"
+    done
 }
 
 case "${1:-}" in
