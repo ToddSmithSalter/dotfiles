@@ -235,11 +235,12 @@ setup() {
     fi
     success "Linked ${scheme:-http}://$new_host"
 
-    # Compiled views can hold values from before .env pointed at this worktree.
+    # Cached config, routes, and compiled views can hold values from before
+    # .env pointed at this worktree.
     if [ -f artisan ]; then
-        step "Clearing compiled views"
-        "$HERD_BIN/php" artisan view:clear --quiet
-        success "Views cleared"
+        step "Clearing Laravel caches"
+        "$HERD_BIN/php" artisan optimize:clear --quiet
+        success "Caches cleared"
     fi
 
     echo ""
