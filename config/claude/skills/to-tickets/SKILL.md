@@ -1,12 +1,12 @@
 ---
 name: to-tickets
-description: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published as GitLab issues with native blocking links.
+description: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges and whether an AFK agent can complete it or it needs a human in the loop, published as GitLab issues with native blocking links.
 disable-model-invocation: true
 ---
 
 # To Tickets
 
-Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
+Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it and its **mode**, AFK or HITL.
 
 ## GitLab
 
@@ -52,6 +52,13 @@ Break the work into **tracer bullet** tickets.
 
 </vertical-slice-rules>
 
+Give each ticket a **mode**:
+
+- **AFK**: an agent can take the ticket from start to merged work with nobody at the keyboard. The acceptance criteria are checkable by tests, typechecks, or commands the agent can run.
+- **HITL** (human in the loop): the ticket cannot finish without a person. Give the reason in one line. Typical reasons: a product or design decision the spec leaves open, a visual or UX judgement, access the agent does not have (credentials, a third-party dashboard, production data, a physical device), a destructive or irreversible step (a data migration on production, a deploy), or verification that only a human can do.
+
+Default to AFK. Prefer to split a ticket so the HITL part is small and isolated: settle the decision or do the manual step in its own HITL ticket, and let the AFK work it unblocks follow. A ticket is HITL only for the part a human must do, never because it is large or hard.
+
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
@@ -61,6 +68,7 @@ Give each ticket its **blocking edges**: the other tickets that must complete be
 Present the proposed breakdown as a numbered list. For each ticket, show:
 
 - **Title**: short descriptive name
+- **Mode**: AFK, or HITL with the one-line reason
 - **Blocked by**: which other tickets (if any) must complete first
 - **What it delivers**: the end-to-end behaviour this ticket makes work
 
@@ -68,6 +76,7 @@ Ask the user:
 
 - Does the granularity feel right? (too coarse / too fine)
 - Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
+- Is each mode right: can every AFK ticket truly finish without you, and does every HITL ticket truly need you?
 - Should any tickets be merged or split further?
 
 Iterate until the user approves the breakdown.
@@ -76,7 +85,7 @@ Iterate until the user approves the breakdown.
 
 Publish one GitLab issue per ticket, in dependency order so blockers exist first and each blocking edge can name a real issue number.
 
-Record each edge as a native blocking link with the `/blocked_by` quick action. Where native links are unavailable, use the `Blocked by:` line described above. Give each ticket the type label that matches its work, plus a priority label if it is a `Bug`. The tickets are agent-grabbable by construction.
+Record each edge as a native blocking link with the `/blocked_by` quick action. Where native links are unavailable, use the `Blocked by:` line described above. Give each ticket the type label that matches its work, plus a priority label if it is a `Bug`. Record the mode in the description, and prefix the title of a HITL ticket with `[HITL]` so it stands out in issue lists. AFK tickets are agent-grabbable by construction. An agent working the frontier picks up AFK tickets only, and hands HITL tickets to the user.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
@@ -87,6 +96,10 @@ Do NOT close or modify any parent issue.
 ## Parent
 
 A reference to the parent issue on the tracker (if the source was an existing issue, otherwise omit this section).
+
+## Mode
+
+AFK, or HITL followed by the one-line reason a human must be involved and what that person must do.
 
 ## What to build
 
