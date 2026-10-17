@@ -14,7 +14,9 @@ Each ticket has a **mode** in its description. **AFK** tickets go to subagents. 
 
 Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
 
-**Implementer subagents** should be run in the background where possible for maximum concurrency.
+An **implementer subagent** is the `implementer` agent type (`subagent_type: implementer`). Its definition holds its per-ticket duties, so pass it pointers: the ticket, the spec, the integration branch, and any research notes. Run implementer subagents in the background where possible for maximum concurrency.
+
+The `implementer` agent runs at low effort. When one fails a ticket for a reason other than needing a person, run that ticket once more with `effort: high`.
 
 ## GitLab
 
@@ -34,12 +36,7 @@ References: `#42` is issue 42, `!42` is merge request 42. GitLab numbers the two
 
 3. Create the integration branch. After the first merge in step 6, open a draft merge request from it (a branch with no commits ahead of the default branch can't open one). Put a `Closes #<n>` line in its description for the spec and for each ticket, so merging it closes them all.
 
-4. Use **implementer subagents** to implement each AFK ticket on the frontier, each in its own worktree on its own branch. Each implementer subagent:
-   - confirms its worktree is based on the integration branch before starting, and resets onto it if not;
-   - calls the Skill tool with `tdd` to build the ticket;
-   - merges the integration branch tip into its own branch before reporting done.
-
-   If an implementer subagent finds it cannot finish without a person, it stops and reports why. Treat that ticket as HITL from then on.
+4. Use **implementer subagents** to implement each AFK ticket on the frontier, each in its own worktree on its own branch. If an implementer subagent reports that it cannot finish without a person, treat that ticket as HITL from then on.
 
 5. For each HITL ticket on the frontier, tell the user what the ticket needs from them and why. Keep the AFK work moving while you wait. When the user has done their part, finish any remaining code for that ticket with an implementer subagent.
 
