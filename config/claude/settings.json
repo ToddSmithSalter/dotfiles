@@ -105,12 +105,6 @@
     "typescript-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
-  "modelSettings": {
-    "claude-opus-5": {
-      "effortLevel": "medium"
-    }
-  },
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
