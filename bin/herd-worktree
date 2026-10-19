@@ -43,7 +43,7 @@ error() { echo -e "${RED}✗${NC} $1" >&2; exit 1; }
 
 # Read KEY from an env file, without surrounding quotes.
 env_get() {
-    grep -E "^$2=" "$1" 2>/dev/null | tail -1 | cut -d= -f2- | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
+    { grep -E "^$2=" "$1" 2>/dev/null || true; } | tail -1 | cut -d= -f2- | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
 }
 
 # Set KEY=value in .env, appending the key if it is missing.
@@ -89,6 +89,15 @@ site="$name.${main_host%.*}"
 new_host="$name.$main_host"
 sites_dir="$HOME/Library/Application Support/Herd/config/valet/Sites"
 certs_dir="$HOME/Library/Application Support/Herd/config/valet/Certificates"
+nginx_dir="$HOME/Library/Application Support/Herd/config/valet/Nginx"
+
+# Herd v2 workspaces run on the PHP version the main site is isolated to, so
+# this worktree does too. Herd notes it on the first line of the site's Nginx
+# config, as "# ISOLATED_PHP_VERSION=8.4" (or "85" from older Herd). Empty for
+# the global version.
+main_php="$(sed -nE '1s/^# ISOLATED_PHP_VERSION=([0-9])\.?([0-9]+)$/\1.\2/p' "$nginx_dir/$main_host" 2>/dev/null || true)"
+php="$HERD_BIN/php${main_php//./}"
+[ -x "$php" ] || error "Herd has no PHP $main_php ($php), which $main_host is isolated to"
 
 # Database settings always come from the main worktree, so a re-run still
 # knows the source database after .env here points at the copy.
@@ -157,12 +166,8 @@ linked_sites() {
     done
 }
 
-unlink_site() {
-    if [ -f "$certs_dir/$1.$tld.crt" ]; then
-        "$HERD_BIN/herd" unsecure "$1.$tld" --quiet 2>/dev/null || true
-    fi
-    "$HERD_BIN/herd" unlink "$1" --quiet
-}
+# Since Herd v2, unlink also removes the site's certificate and isolation.
+unlink_site() { "$HERD_BIN/herd" unlink "$1" --quiet; }
 
 setup() {
     [ -f .env ] || error "No .env in this worktree ($worktree). Bloom copies it before setup runs."
@@ -194,7 +199,7 @@ setup() {
         case "$lock" in
             *composer.lock)
                 # Fast when vendor/ already matches the lock file.
-                "$HERD_BIN/php" "$HERD_BIN/composer" install --working-dir="$dir" --no-interaction --quiet
+                "$php" "$HERD_BIN/composer" install --working-dir="$dir" --no-interaction --quiet
                 ;;
             *package-lock.json)
                 # npm ci always deletes node_modules/ first, so only run it when
@@ -248,7 +253,7 @@ setup() {
     # not run yet. Only migrate a database that belongs to this worktree.
     if [ -f artisan ] && [ "$db_ready" = "1" ]; then
         step "Running migrations"
-        "$HERD_BIN/php" artisan migrate --force
+        "$php" artisan migrate --force
         success "Migrations ran"
     fi
 
@@ -275,11 +280,15 @@ setup() {
     done
     secure=""
     [ "$scheme" = "https" ] && secure="--secure"
-    "$HERD_BIN/herd" link "$site" $secure --no-interaction --quiet
-    # The site's certificate and Nginx server already cover *.<site>, so the
-    # subdomain links need no --secure.
+    isolate=""
+    [ -n "$main_php" ] && isolate="--isolate=$main_php"
+    "$HERD_BIN/herd" link "$site" $secure $isolate --no-interaction --quiet
+    # The site's certificate and Nginx server (with its PHP version) already
+    # cover *.<site>, so a subdomain link is only a symlink. Since Herd v2,
+    # herd link also runs artisan boost:update, which each subdomain would
+    # repeat.
     for sub in $subs; do
-        "$HERD_BIN/herd" link "$sub.$site" --no-interaction --quiet
+        ln -sfn "$worktree" "$sites_dir/$sub.$site"
     done
     for n in $names; do
         [ "$(readlink "$sites_dir/$n" 2>/dev/null)" = "$worktree" ] || error "Herd did not link $n.$tld to this worktree"
@@ -311,7 +320,7 @@ setup() {
     # .env pointed at this worktree.
     if [ -f artisan ]; then
         step "Clearing Laravel caches"
-        "$HERD_BIN/php" artisan optimize:clear --quiet
+        "$php" artisan optimize:clear --quiet
         success "Caches cleared"
     fi
 
